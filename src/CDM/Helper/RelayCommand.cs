@@ -11,6 +11,7 @@ namespace CDM.Helper
     {
         private Action<object> execute;
         private Func<object, bool> canExecute;
+        private Action recentItemSort;
 
         public event EventHandler CanExecuteChanged
         {
@@ -22,6 +23,11 @@ namespace CDM.Helper
         {
             this.execute = execute;
             this.canExecute = canExecute;
+        }
+
+        public RelayCommand(Action recentItemSort)
+        {
+            this.recentItemSort = recentItemSort;
         }
 
         public bool CanExecute(object parameter)

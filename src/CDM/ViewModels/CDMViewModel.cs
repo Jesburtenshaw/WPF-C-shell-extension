@@ -1,6 +1,7 @@
 ﻿using CDM.Common;
 using CDM.Helper;
 using CDM.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 
 namespace CDM.ViewModels
 {
@@ -18,6 +20,7 @@ namespace CDM.ViewModels
         #region :: Constructor ::
         public CDMViewModel()
         {
+
             DoubleClickCommand = new RelayCommand(DoubleDriveClick);
             BackWindowCommand = new RelayCommand(BackNavigationClick);
             SearchBoxTextChangedCommand = new RelayCommand(searchBoxTextChanged);
@@ -25,54 +28,46 @@ namespace CDM.ViewModels
             RecentItemDoubleClickCommand = new RelayCommand(RecentItemDoubleClick);
             PinnedItemDoubleClickCommand = new RelayCommand(PinnedItemDoubleClick);
 
-
-            try
-            {
-                DriveInfo[] drives = DriveInfo.GetDrives();
-                DriveList = new ObservableCollection<DriveModel>();
-                DriveSelectedItem = new DriveModel();
-                foreach (DriveInfo drive in drives)
-                {
-                    DriveList.Add(new DriveModel()
-                    {
-                        DriveName = drive.Name,
-                        DriveDescription = drive.DriveFormat,
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowErrorMessage(ex.Message);
-            }
+            //RecentItemSortCommand = new RelayCommand(RecentItemSort);
 
             RecentItemList = new ObservableCollection<FileFolderModel>();
             PinnedItemList = new ObservableCollection<FileFolderModel>();
             FoldersItemList = new ObservableCollection<FileFolderModel>();
+
+            GetDrivesItem();
             GetRecentItems();
             GetPinnedItems();
             //SearchBox();
 
-            //TxtSearchGotFocusCommand = new RelayCommand(searchBoxGotFocus);
-            //TxtSearchLostFocusCommand = new RelayCommand(searchBoxLostFocus);
-
+            TxtSearchGotFocusCommand = new RelayCommand(searchBoxGotFocus);
+            TxtSearchLostFocusCommand = new RelayCommand(searchBoxLostFocus);
+            //SearchItemCommand = new RelayCommand(searchItem);
 
             //DriveCommand = new RelayCommand(driveCommand);
-
+            IsSearchBoxPlaceholderVisible = Visibility.Visible;
             IsDriveWindowVisible = Visibility.Visible;
             IsDriveFoldersVisible = Visibility.Collapsed;
         }
-
         #endregion
 
-        //private void searchBoxLostFocus(object obj)
+        //private void RecentItemSort(object obj)
         //{
-        //    throw new NotImplementedException();
+        //    IsAscending = !IsAscending;
         //}
 
-        //private void searchBoxGotFocus(object obj)
+
+        //private bool _isAscending = true;
+        //public bool IsAscending
         //{
-        //    throw new NotImplementedException();
+        //    get => _isAscending;
+        //    set
+        //    {
+        //        _isAscending = value;
+        //        OnPropertyChanged(nameof(IsAscending));
+        //    }
         //}
+
+
 
         #region :: Properties ::
         public string TempFolderFileSource { get; set; }
@@ -197,6 +192,8 @@ namespace CDM.ViewModels
             }
         }
         private Visibility _isDriveFoldersVisible;
+
+
         public Visibility IsDriveFoldersVisible
         {
             get { return _isDriveFoldersVisible; }
@@ -204,6 +201,17 @@ namespace CDM.ViewModels
             {
                 _isDriveFoldersVisible = value;
                 OnPropertyChanged(nameof(IsDriveFoldersVisible));
+            }
+        }
+
+        private Visibility _isSearchBoxPlaceholderVisible;
+        public Visibility IsSearchBoxPlaceholderVisible
+        {
+            get { return _isSearchBoxPlaceholderVisible; }
+            set
+            {
+                _isSearchBoxPlaceholderVisible = value;
+                OnPropertyChanged(nameof(IsSearchBoxPlaceholderVisible));
             }
         }
         #endregion
@@ -217,11 +225,55 @@ namespace CDM.ViewModels
         public RelayCommand FolderItemDoubleClickCommand { get; set; }
         public RelayCommand RecentItemDoubleClickCommand { get; set; }
         public RelayCommand PinnedItemDoubleClickCommand { get; set; }
+        public RelayCommand SearchItemCommand { get; set; }
+        //public RelayCommand RecentItemSortCommand { get; set; }
 
         #endregion
 
         #region :: Methods ::
-        public void GetRecentItems()
+        public async void GetDrivesItem()
+        {
+            try
+            {
+                DriveInfo[] drives = DriveInfo.GetDrives();
+                DriveList = new ObservableCollection<DriveModel>();
+                DriveSelectedItem = new DriveModel();
+                foreach (DriveInfo drive in drives)
+                {
+                    DriveList.Add(new DriveModel()
+                    {
+                        DriveName = drive.Name,
+                        DriveDescription = drive.DriveFormat,
+                    });
+                }
+                //DriveList.Add(new DriveModel()
+                //{
+                //    DriveName = "Test1",
+                //    DriveDescription = "Tetsing",
+                //});
+                //DriveList.Add(new DriveModel()
+                //{
+                //    DriveName = "Test2",
+                //    DriveDescription = "Tetsing2",
+                //});
+                //DriveList.Add(new DriveModel()
+                //{
+                //    DriveName = "Test3",
+                //    DriveDescription = "Tetsing2",
+                //});
+                //DriveList.Add(new DriveModel()
+                //{
+                //    DriveName = "Test4",
+                //    DriveDescription = "Tetsing2",
+                //});
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+            }
+        }
+
+        public async void GetRecentItems()
         {
             try
             {
@@ -254,7 +306,7 @@ namespace CDM.ViewModels
             }
         }
 
-        public void GetPinnedItems()
+        public async void GetPinnedItems()
         {
             try
             {
@@ -334,7 +386,6 @@ namespace CDM.ViewModels
             //Check if current is root directory or drive
             if (directoryHistory.Count == 1 || IsRootFolder(directoryHistory.Peek()))
             {
-
                 IsDriveWindowVisible = Visibility.Visible;
                 IsDriveFoldersVisible = Visibility.Collapsed;
                 return;
@@ -344,6 +395,9 @@ namespace CDM.ViewModels
             directoryHistory.Pop();
             NavigateToFolder(directoryHistory.Peek());
 
+            TxtSearchBoxItem = string.Empty;
+            IsSearchBoxPlaceholderVisible = Visibility.Visible;
+            CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
         }
 
         private void DoubleDriveClick(object sender)
@@ -371,16 +425,27 @@ namespace CDM.ViewModels
                 MessageBox.Show($"Error Occured! {Environment.NewLine}{Environment.NewLine} {ex.Message}");
                 //throw ex;
             }
+
+            //TxtSearchBoxItem = string.Empty;
+            //IsSearchBoxPlaceholderVisible = Visibility.Visible;
+            //CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
         }
         private void searchBoxTextChanged(object sender)
         {
-            if (TxtSearchBoxItem == "search")
+            if (!string.IsNullOrEmpty(TxtSearchBoxItem))
             {
-                TxtSearchBoxItem = string.Empty;
+                IsSearchBoxPlaceholderVisible = Visibility.Collapsed;
+                CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(FoldersItemList);
+                view.Filter = searchItemFilter;
+                return;
             }
-            //CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
-            //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(FoldersItemList);
-            //view.Filter = folderListFilter;
+            else
+            {
+                IsSearchBoxPlaceholderVisible = Visibility.Visible;
+                CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
+            }
+
         }
 
         public void FolderItemDoubleClick(object sender)
@@ -396,6 +461,9 @@ namespace CDM.ViewModels
                     directoryHistory.Push(path);
                     NavigateToFolder(path);
 
+                    //TxtSearchBoxItem = string.Empty;
+                    //IsSearchBoxPlaceholderVisible = Visibility.Visible;
+                    //CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
                 }
 
                 // Check if the path exist and path is file
@@ -411,10 +479,7 @@ namespace CDM.ViewModels
                         //throw ex;
                     }
                 }
-
-
             }
-
         }
 
         public void RecentItemDoubleClick(object sender)
@@ -452,7 +517,6 @@ namespace CDM.ViewModels
         {
             try
             {
-
                 if (!string.IsNullOrEmpty(folderPath))
                 {
                     List<FileFolderModel> subFolderFiles = new List<FileFolderModel>();
@@ -516,7 +580,9 @@ namespace CDM.ViewModels
             {
                 throw ex;
             }
-
+            TxtSearchBoxItem = string.Empty;
+            IsSearchBoxPlaceholderVisible = Visibility.Visible;
+            CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
         }
 
         private bool IsRootFolder(string path)
@@ -592,6 +658,33 @@ namespace CDM.ViewModels
             MessageBox.Show($"Error Occured! {Environment.NewLine}{Environment.NewLine} {message}");
         }
 
+        //search functionlaity
+        private void searchBoxLostFocus(object obj)
+        {
+            if (!string.IsNullOrEmpty(TxtSearchBoxItem))
+            {
+                return;
+            }
+            else
+            {
+                IsSearchBoxPlaceholderVisible = Visibility.Visible;
+
+                CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
+            }
+        }
+
+        private void searchBoxGotFocus(object obj)
+        {
+            IsSearchBoxPlaceholderVisible = Visibility.Collapsed;
+        }
+
+        private bool searchItemFilter(object item)
+        {
+            if (string.IsNullOrEmpty(TxtSearchBoxItem) || TxtSearchBoxItem == "Search")
+                return true;
+            else
+                return (item as FileFolderModel).Name.StartsWith(TxtSearchBoxItem, StringComparison.OrdinalIgnoreCase);
+        }
         #endregion
     }
 }

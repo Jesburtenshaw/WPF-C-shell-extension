@@ -62,7 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\IconHelper.cs" />
+    <Compile Include="Converters\ArrowPathConverter.cs" />
+    <Compile Include="Helper\LightDarkModeDetector.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
+    <Compile Include="Helper\ResourceDictionaryManager.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
     <Compile Include="Models\DriveModel.cs" />
     <Compile Include="Models\FileFolderModel.cs" />
@@ -102,6 +105,18 @@
     <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\DarkStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\LightStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\CDMUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
