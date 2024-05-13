@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -54,6 +55,7 @@ namespace CDM.ViewModels
             DoRenameCommand = new RelayCommand(DoRename);
             CancelRenameCommand = new RelayCommand(CancelRename);
             RenameTextChangedCommand = new RelayCommand(RenameTextChanged);
+            ClearSearchCommand = new RelayCommand(ClearSearch);
 
             //DriveCommand = new RelayCommand(driveCommand);
             IsSearchBoxPlaceholderVisible = Visibility.Visible;
@@ -302,6 +304,7 @@ namespace CDM.ViewModels
         public RelayCommand DoRenameCommand { get; set; }
         public RelayCommand CancelRenameCommand { get; set; }
         public RelayCommand RenameTextChangedCommand {  get; set; }
+        public RelayCommand ClearSearchCommand { get; set; }
 
         #endregion
 
@@ -648,8 +651,14 @@ namespace CDM.ViewModels
             CurRenameStatus.Desc = "";
         }
 
+        private void ClearSearch(object obj)
+        {
+            TxtSearchBoxItem = "";
+        }
+
         private void BackNavigationClick(object obj)
         {
+            FoldersItemList.Clear();
             CurFolder = nullFolder;
             if (directoryHistory.Count == 0)
             {
@@ -678,6 +687,7 @@ namespace CDM.ViewModels
         {
             try
             {
+                CurFolder = nullFolder;
                 FoldersItemList.Clear();
 
                 DriveModel item = sender as DriveModel;
@@ -744,7 +754,15 @@ namespace CDM.ViewModels
             else
             {
                 IsSearchBoxPlaceholderVisible = Visibility.Visible;
-                CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
+                if (FoldersItemList.Count > 0)
+                {
+                    CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
+                }
+                else
+                {
+                    CollectionViewSource.GetDefaultView(RecentItemList).Refresh();
+                    CollectionViewSource.GetDefaultView(PinnedItemList).Refresh();
+                }
             }
         }
 
@@ -939,7 +957,7 @@ namespace CDM.ViewModels
 
         private bool IsRootFolder(string path)
         {
-            if (path == CurrentDrivePath)
+            if (path.Length == 3 || path == CurrentDrivePath)
             {
                 return true;
             }

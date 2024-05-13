@@ -16,6 +16,7 @@
             <converter:BoolVisibilityConverter x:Key="BoolVisibilityConverter" />
             <converter:BoolVisibilityInverseConverter x:Key="BoolVisibilityInverseConverter" />
             <converter:DirFileTypeVisibilityConverter x:Key="DirFileTypeVisibilityConverter" />
+            <converter:EmptyStringVisibilityConverter x:Key="EmptyStringVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -381,12 +382,37 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
                         <Border BorderBrush="{DynamicResource SeachBoxBorderColor}"
+                             Background="{DynamicResource SeachBoxBackgroundColor}"
+                             BorderThickness="0 1 0 1"
+                             Grid.Column="1"
+                             Height="40"
+                             Width="20"
+                             HorizontalAlignment="Right"
+                             ClipToBounds="True"
+                             CornerRadius="0,0,0,0"
+                             Visibility="{Binding TxtSearchBoxItem, Converter={StaticResource EmptyStringVisibilityConverter}}">
+                            <Button
+                                Command="{Binding ClearSearchCommand}"
+                                Background="Transparent"
+                                BorderThickness="1" Cursor="Hand"
+                                Foreground="{DynamicResource WindowForegroundColor}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <TextBlock Text="×" FontSize="30" FontWeight="Thin">
+                                        </TextBlock>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Border>
+                        
+                        <Border BorderBrush="{DynamicResource SeachBoxBorderColor}"
                                 Background="{DynamicResource SeachBoxBackgroundColor}"
                                 BorderThickness="0 1 1 1"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Height="40"
                                 Width="40"
                                 HorizontalAlignment="Right"
