@@ -8,23 +8,33 @@ using System.Xml.Linq;
 
 namespace CDM.Models
 {
-    public class DriveModel: INotifyPropertyChanged
+    public class SearchStatusModel : INotifyPropertyChanged
     {
-        public string DriveName { get; set; }
-        public string DriveDescription { get; set; }
-        public string Type { get; set; } = "Drive";
-
-        private bool isPined;
-        public bool IsPined
+        private string desc;
+        public string Desc
         {
             get
             {
-                return isPined;
+                return desc;
             }
             set
             {
-                isPined = value;
-                OnPropertyChanged(nameof(IsPined));
+                desc = value;
+                OnPropertyChanged(nameof(Desc));
+            }
+        }
+
+        private bool isError;
+        public bool IsError
+        {
+            get
+            {
+                return isError;
+            }
+            set
+            {
+                isError = value;
+                OnPropertyChanged(nameof(IsError));
             }
         }
 

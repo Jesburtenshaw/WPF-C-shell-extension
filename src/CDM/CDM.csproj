@@ -61,12 +61,24 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DirectoryHelper.cs" />
+    <Compile Include="Common\ExceptionHelper.cs" />
     <Compile Include="Common\IconHelper.cs" />
+    <Compile Include="Common\ShortcutHelper.cs" />
+    <Compile Include="Converters\DirFileTypeVisibilityConverter.cs" />
+    <Compile Include="Converters\BoolVisibilityInverseConverter.cs" />
+    <Compile Include="Converters\BoolVisibilityConverter.cs" />
     <Compile Include="Converters\ArrowPathConverter.cs" />
     <Compile Include="Helper\LightDarkModeDetector.cs" />
+    <Compile Include="Helper\DriveManager.cs" />
+    <Compile Include="Helper\PinManager.cs" />
+    <Compile Include="Helper\RecentManager.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Helper\ResourceDictionaryManager.cs" />
+    <Compile Include="Helper\StarManager.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
+    <Compile Include="Models\RenameStatusModel.cs" />
+    <Compile Include="Models\SearchStatusModel.cs" />
     <Compile Include="Models\DriveModel.cs" />
     <Compile Include="Models\FileFolderModel.cs" />
     <Compile Include="UserControls\CDMUserControl.xaml.cs">

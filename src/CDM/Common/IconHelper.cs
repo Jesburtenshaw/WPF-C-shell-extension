@@ -51,7 +51,7 @@ namespace CDM.Common
                     return null;
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }

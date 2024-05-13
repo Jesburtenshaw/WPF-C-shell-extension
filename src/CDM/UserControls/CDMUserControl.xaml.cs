@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -13,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using CDM.Common;
 using CDM.Helper;
 using CDM.ViewModels;
 using Microsoft.Win32;
@@ -24,8 +27,14 @@ namespace CDM.UserControls
     /// </summary>
     public partial class CDMUserControl : UserControl
     {
+        public delegate void dlgtTest();
+        public event dlgtTest EventTest;
+
         public CDMUserControl()
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
             InitializeComponent();
             this.DataContext = new CDMViewModel();
             SetInitialTheme();
@@ -33,10 +42,31 @@ namespace CDM.UserControls
             // Subscribe to system theme changes
             Microsoft.Win32.SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
             //IsSystemInDarkMode();
+
+            ListOfDriveItems.MouseRightButtonDown += ListOfDriveItems_MouseRightButtonDown;
         }
 
-        public delegate void dlgtTest();
-        public event dlgtTest EventTest;
+        private void ListOfDriveItems_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception exception = e.ExceptionObject as Exception;
+            HandleException(exception);
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            HandleException(e.Exception);
+            e.SetObserved();
+        }
+
+        private void HandleException(Exception ex)
+        {
+            ExceptionHelper.ShowErrorMessage(ex);
+        }
 
         private void SetInitialTheme()
         {
@@ -88,6 +118,5 @@ namespace CDM.UserControls
                 //UpdateUIForTheme(isDarkTheme);
             }
         }
-
     }
 }
