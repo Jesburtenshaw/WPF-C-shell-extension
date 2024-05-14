@@ -34,6 +34,7 @@ namespace CDM.UserControls
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            Application.Current.DispatcherUnhandledException += Application_DispatcherUnhandledException;
 
             InitializeComponent();
             this.DataContext = new CDMViewModel();
@@ -42,13 +43,12 @@ namespace CDM.UserControls
             // Subscribe to system theme changes
             Microsoft.Win32.SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
             //IsSystemInDarkMode();
-
-            ListOfDriveItems.MouseRightButtonDown += ListOfDriveItems_MouseRightButtonDown;
         }
 
-        private void ListOfDriveItems_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-
+            HandleException(e.Exception);
+            e.Handled = true;
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
