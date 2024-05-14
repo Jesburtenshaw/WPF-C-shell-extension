@@ -14,9 +14,18 @@ namespace CDM.Helper
     public static class DriveManager
     {
         private static ObservableCollection<DriveModel> DriveList = new ObservableCollection<DriveModel>();
+        public static ObservableCollection<FilterConditionModel> Drives = new ObservableCollection<FilterConditionModel>();
 
         public static ObservableCollection<DriveModel> GetDrivesItem()
         {
+            var fcm = new FilterConditionModel
+            {
+                Code = "",
+                Name = "All drives"
+            };
+            fcm.PropertyChanged += FilterConditionModel_PropertyChanged;
+            Drives.Add(fcm);
+
             try
             {
                 DriveInfo[] drives = DriveInfo.GetDrives();//.Where(item => item.DriveType == DriveType.Network).ToArray();        
@@ -28,6 +37,13 @@ namespace CDM.Helper
                         DriveDescription = drive.VolumeLabel,
                         IsPined = PinManager.IsPined(drive.Name)
                     });
+                    fcm = new FilterConditionModel
+                    {
+                        Code = drive.Name,
+                        Name = drive.Name
+                    };
+                    fcm.PropertyChanged += FilterConditionModel_PropertyChanged;
+                    Drives.Add(fcm);
                 }
                 //DriveList.Add(new DriveModel()
                 //{
@@ -55,6 +71,29 @@ namespace CDM.Helper
                 ExceptionHelper.ShowErrorMessage(ex);
             }
             return DriveList;
+        }
+
+        public static event EventHandler DriveIsSelectedChanged;
+
+        private static void FilterConditionModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (!e.PropertyName.Equals("IsSelected"))
+            {
+                return;
+            }
+            var fcm = sender as FilterConditionModel;
+            if (string.IsNullOrEmpty(fcm.Code))
+            {
+                foreach (var drive in Drives)
+                {
+                    if (string.IsNullOrEmpty(drive.Code))
+                    {
+                        continue;
+                    }
+                    drive.IsSelected = fcm.IsSelected;
+                }
+            }
+            DriveIsSelectedChanged?.Invoke(sender, e);
         }
     }
 }

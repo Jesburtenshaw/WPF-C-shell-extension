@@ -38,6 +38,34 @@ namespace CDM.Models
             }
         }
 
+        private bool canSearch;
+        public bool CanSearch
+        {
+            get
+            {
+                return canSearch;
+            }
+            set
+            {
+                canSearch = value;
+                OnPropertyChanged(nameof(CanSearch));
+            }
+        }
+
+        private bool isDoing;
+        public bool IsDoing
+        {
+            get
+            {
+                return isDoing;
+            }
+            set
+            {
+                isDoing = value;
+                OnPropertyChanged(nameof(IsDoing));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)

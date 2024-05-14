@@ -38,7 +38,7 @@ namespace CDM.UserControls
             InitializeComponent();
             this.DataContext = new CDMViewModel();
             SetInitialTheme();
-
+            
             // Subscribe to system theme changes
             Microsoft.Win32.SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
             //IsSystemInDarkMode();

@@ -419,7 +419,7 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                 ClipToBounds="True"
                                 CornerRadius="0,3,3,0">
                             <Button x:Name="purchasedBookSearchBtn"
-                                    Command="{Binding SearchItemCommand}"
+                                    Command="{Binding DoSearchCommand}"
                                     Style="{StaticResource btnSearch}">
                                 <!--<Image Source="/Resources/icnsearch.png"
                                        Height="14"
@@ -454,12 +454,13 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                 <TextBox x:Name="txtSearchBox"
                                          Grid.Column="1"
                                          CaretBrush="Black"
+                                         IsEnabled="{Binding CurSearchStatus.CanSearch}"
                                          Text="{Binding TxtSearchBoxItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                          Style="{StaticResource txtSearchBoxStyle}">
                                     <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="TextChanged">
-                                            <i:InvokeCommandAction Command="{Binding SearchBoxTextChangedCommand}"></i:InvokeCommandAction>
-                                        </i:EventTrigger>
+                                        <!--<i:EventTrigger EventName="TextChanged">-->
+                                        <!--    <i:InvokeCommandAction Command="{Binding SearchBoxTextChangedCommand}"></i:InvokeCommandAction>-->
+                                        <!--</i:EventTrigger>-->
                                         <i:EventTrigger EventName="GotFocus">
                                             <i:InvokeCommandAction Command="{Binding TxtSearchGotFocusCommand}" />
                                         </i:EventTrigger>
@@ -467,6 +468,9 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                             <i:InvokeCommandAction Command="{Binding TxtSearchLostFocusCommand}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding DoSearchCommand}" />
+                                    </TextBox.InputBindings>
                                 </TextBox>
 
                                 <Popup Name="tipSearchError" IsOpen="{Binding CurSearchStatus.IsError}"
@@ -1013,7 +1017,163 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                 <Grid Grid.Row="2"
                       Name="DriveFoldersWindow"
                       Visibility="{Binding IsDriveFoldersVisible}">
-                    <DataGrid x:Name="ListOfDriveItems"
+                    <StackPanel Orientation="Vertical">
+                        <Border BorderBrush="#6b6b6b" BorderThickness="0 2 0 2"
+                             Visibility="{Binding CurSearchStatus.IsDoing, Converter={StaticResource BoolVisibilityConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Text="Results for: "
+                                    Foreground="{DynamicResource WindowForegroundColor}"></TextBlock>
+                                    <Button x:Name="btnSearchFlag" Cursor="Arrow"
+                                    Foreground="#A0B8EC" FontSize="16" FontWeight="Bold" Width="30"
+                                    Style="{StaticResource btnSearch}">
+                                        <Path Data="M0,203.25c0,112.1,91.2,203.2,203.2,203.2c51.6,0,98.8-19.4,134.7-51.2l129.5,129.5c2.4,2.4,5.5,3.6,8.7,3.6
+            s6.3-1.2,8.7-3.6c4.8-4.8,4.8-12.5,0-17.3l-129.6-129.5c31.8-35.9,51.2-83,51.2-134.7c0-112.1-91.2-203.2-203.2-203.2
+            S0,91.15,0,203.25z M381.9,203.25c0,98.5-80.2,178.7-178.7,178.7s-178.7-80.2-178.7-178.7s80.2-178.7,178.7-178.7
+            S381.9,104.65,381.9,203.25z"
+                                      Stretch="Uniform"
+                                      Height="14"
+                                      Style="{StaticResource IcnPathStyle}" />
+                                    </Button>
+                                    <TextBlock VerticalAlignment="Center" FontSize="16" Text="{Binding TxtSearchBoxItem}" FontWeight="Bold"
+                                     Foreground="#A0B8EC"></TextBlock>
+                                    <Button
+                                    Command="{Binding ClearSearchCommand}"
+                                    Background="Transparent" FontSize="16"
+                                    BorderThickness="1" Cursor="Hand" Margin="5,0,5,0"
+                                    Foreground="{DynamicResource WindowForegroundColor}">
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <TextBlock Text="×" FontSize="30" FontWeight="Thin">
+                                                </TextBlock>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                    <TextBlock Text="{Binding CurFilterStatus.CurDrives}" Name="tbDrives" VerticalAlignment="Center"
+                                    FontSize="16" FontWeight="Bold"
+                                    Foreground="{DynamicResource WindowForegroundColor}"></TextBlock>
+                                    <Button Visibility="{Binding CurFilterStatus.ShowDrives, Converter={StaticResource BoolVisibilityInverseConverter}}"
+                                    Command="{Binding ShowDrivesCommand}"
+                                    Background="Transparent" FontSize="16"
+                                    BorderThickness="1" Cursor="Hand" Margin="3,0,20,0"
+                                    Foreground="{DynamicResource WindowForegroundColor}">
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <TextBlock VerticalAlignment="Center" Text="∨" FontSize="16" FontWeight="Thin">
+                                                </TextBlock>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <Button Visibility="{Binding CurFilterStatus.ShowDrives, Converter={StaticResource BoolVisibilityConverter}}"
+                                    Command="{Binding ShowDrivesCommand}"
+                                    Background="Transparent" FontSize="16"
+                                    BorderThickness="1" Cursor="Hand" Margin="3,0,20,0"
+                                    Foreground="{DynamicResource WindowForegroundColor}">
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <TextBlock VerticalAlignment="Center" Text="∧" FontSize="16" FontWeight="Thin">
+                                                </TextBlock>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <Popup Name="popupDrives" IsOpen="{Binding CurFilterStatus.ShowDrives}"
+                                   PlacementTarget="{Binding ElementName=tbDrives}"
+                                   Placement="Bottom" VerticalOffset="-1" >
+                                        <Border Margin="0 0 0 0"
+                                        BorderThickness="0"
+                                        BorderBrush="#6b6b6b"
+                                        CornerRadius="3"
+                                        Width="110"
+                                        Height="Auto"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Stretch">
+                                            <ListView SelectionMode="Multiple" FontSize="16"
+                                                      ItemsSource="{Binding Drives,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"                                                      
+                                            Background="{DynamicResource WindowBackgroundColor}">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource WindowForegroundColor}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="{Binding Name}"></CheckBox>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                        </Border>
+                                    </Popup>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                    <TextBlock Name="tbTypes" Text="{Binding CurFilterStatus.CurType}" VerticalAlignment="Center"
+                                    FontSize="16" FontWeight="Bold"
+                                    Foreground="{DynamicResource WindowForegroundColor}"></TextBlock>
+                                    <Button Visibility="{Binding CurFilterStatus.ShowTypes, Converter={StaticResource BoolVisibilityInverseConverter}}"
+                                    Command="{Binding ShowTypesCommand}"
+                                    Background="Transparent" FontSize="16"
+                                    BorderThickness="1" Cursor="Hand" Margin="3,0,20,0"
+                                    Foreground="{DynamicResource WindowForegroundColor}">
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <TextBlock VerticalAlignment="Center" Text="∨" FontSize="16" FontWeight="Thin">
+                                                </TextBlock>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <Button Visibility="{Binding CurFilterStatus.ShowTypes, Converter={StaticResource BoolVisibilityConverter}}"
+                                    Command="{Binding ShowTypesCommand}"
+                                    Background="Transparent" FontSize="16"
+                                    BorderThickness="1" Cursor="Hand" Margin="3,0,20,0"
+                                    Foreground="{DynamicResource WindowForegroundColor}">
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <TextBlock VerticalAlignment="Center" Text="∧" FontSize="16" FontWeight="Thin">
+                                                </TextBlock>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <Popup Name="popupTypes" IsOpen="{Binding CurFilterStatus.ShowTypes}"
+                                   PlacementTarget="{Binding ElementName=tbTypes}"
+                                   Placement="Bottom" VerticalOffset="-1" >
+                                        <Border Margin="0 0 0 0"
+                                        BorderThickness="0"
+                                        BorderBrush="#6b6b6b"
+                                        CornerRadius="3"
+                                        Width="110"
+                                        Height="Auto"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Stretch">
+                                            <ListView SelectionMode="Single" FontSize="16" 
+                                                      ItemsSource="{Binding Types}"
+                                                      SelectedItem="{Binding SelectedType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                Background="{DynamicResource WindowBackgroundColor}">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Foreground="{DynamicResource WindowForegroundColor}" VerticalAlignment="Center" Text="{Binding Name}"></TextBlock>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                        </Border>
+                                    </Popup>
+                                </StackPanel>
+                                <Button Grid.Column="3"
+                                    Command="{Binding ResetFilterCommand}"
+                                    Background="Transparent" FontSize="16"
+                                    BorderThickness="1" Cursor="Hand" Margin="0,0,0,0"
+                                    Foreground="{DynamicResource WindowForegroundColor}">
+                                    <Button.Template>
+                                        <ControlTemplate>
+                                            <TextBlock Text="↺" FontSize="30" FontWeight="Thin">
+                                            </TextBlock>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                        </Border>
+                        <DataGrid x:Name="ListOfDriveItems"
                               Grid.Row="2"
                               Grid.ColumnSpan="2"
                               ItemsSource="{Binding FoldersItemList}"
@@ -1024,17 +1184,17 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                               Style="{StaticResource DGStyle}"
                               SelectionMode="Single"
                               SelectionUnit="FullRow">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDoubleClick">
-                                <i:InvokeCommandAction Command="{Binding FolderItemDoubleClickCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn MinWidth="70"
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding FolderItemDoubleClickCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn MinWidth="70"
                                                     Width="auto">
-                                <DataGridTemplateColumn.Header>
-                                    <Grid>
-                                        <Path Margin="25 0 0 0"
+                                    <DataGridTemplateColumn.Header>
+                                        <Grid>
+                                            <Path Margin="25 0 0 0"
                                               Height="15"
                                               Width="15"
                                               Style="{StaticResource IcnPathStyle}"
@@ -1047,34 +1207,34 @@ c0.179,0.017,0.357,0.036,0.536,0.049c0.129,0.008,0.26,0.011,0.389,0.017c0.586,0.
 c9.182,0,17.335-5.876,20.239-14.587l85.333-256C516.526,227.605,506.244,213.34,491.683,213.34z M427.683,170.673v42.667H406.35
 v-42.667H427.683z M129.016,42.673h234.667V149.34v64H129.016v-128V42.673z M43.683,106.673H86.35v124.538l-42.667,128V106.673z
  M390.974,469.34H51.948l34.533-103.6l36.578-109.733h261.957h64h13.068L390.974,469.34z" />
-                                    </Grid>
-                                </DataGridTemplateColumn.Header>
+                                        </Grid>
+                                    </DataGridTemplateColumn.Header>
 
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Image Height="25"
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="25"
                                                Width="25"
                                                Source="{Binding IconSource}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Width="*"
+                                <DataGridTextColumn Width="*"
                                                 MinWidth="250"
                                                 Header="Name"
                                                 ElementStyle="{StaticResource Centering}"
                                                 Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <DataGridTemplateColumn MinWidth="80" Width="auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid Grid.Column="0" Visibility="{Binding Type, Converter={StaticResource DirFileTypeVisibilityConverter}}">
-                                                <Button x:Name="btnStar" ToolTip="Set this item as default" 
+                                <DataGridTemplateColumn MinWidth="80" Width="auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Grid.Column="0" Visibility="{Binding Type, Converter={StaticResource DirFileTypeVisibilityConverter}}">
+                                                    <Button x:Name="btnStar" ToolTip="Set this item as default" 
     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}, Path=DataContext.StarCommand}"
     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=DataContext}"
     Background="{DynamicResource DriveNavigationBtnBackgrounfColor}"
@@ -1083,7 +1243,7 @@ v-42.667H427.683z M129.016,42.673h234.667V149.34v64H129.016v-128V42.673z M43.683
     Margin="0 0 5 0"
     Width="20"
     Height="20">
-                                                    <Path Data="M98 193 c-8 -17 -25 -30 -45 -35 -38 -10 -41 -18 -12 -43 14 -13 19
+                                                        <Path Data="M98 193 c-8 -17 -25 -30 -45 -35 -38 -10 -41 -18 -12 -43 14 -13 19
 -29 17 -50 -3 -27 0 -30 22 -27 31 3 49 3 80 0 22 -3 25 0 22 27 -2 21 3 37
 17 50 29 25 26 33 -11 43 -21 5 -38 18 -46 35 -7 15 -17 27 -22 27 -5 0 -15
 -12 -22 -27z m37 -23 c3 -11 17 -23 31 -26 24 -6 24 -7 8 -25 -11 -12 -14 -27
@@ -1094,12 +1254,12 @@ v-42.667H427.683z M129.016,42.673h234.667V149.34v64H129.016v-128V42.673z M43.683
         Height="20"
         Width="20"                                                               
         Stretch="Uniform">
-                                                        <Path.RenderTransform>
-                                                            <RotateTransform Angle="45" CenterX="8" CenterY="10"></RotateTransform>
-                                                        </Path.RenderTransform>
-                                                    </Path>
-                                                </Button>
-                                                <Button x:Name="btnUnstar" ToolTip="Unset this item as default"
+                                                            <Path.RenderTransform>
+                                                                <RotateTransform Angle="45" CenterX="8" CenterY="10"></RotateTransform>
+                                                            </Path.RenderTransform>
+                                                        </Path>
+                                                    </Button>
+                                                    <Button x:Name="btnUnstar" ToolTip="Unset this item as default"
     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}, Path=DataContext.UnstarCommand}"
     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=DataContext}"
     Background="{DynamicResource DriveNavigationBtnBackgrounfColor}"
@@ -1108,7 +1268,7 @@ v-42.667H427.683z M129.016,42.673h234.667V149.34v64H129.016v-128V42.673z M43.683
     Margin="0 0 5 0"
     Width="20"
     Height="20">
-                                                    <Path Data="M293 588 c-4 -7 -20 -46 -34 -88 l-26 -75 -85 -3 c-134 -4 -144 -43
+                                                        <Path Data="M293 588 c-4 -7 -20 -46 -34 -88 l-26 -75 -85 -3 c-134 -4 -144 -43
 -32 -125 49 -36 64 -53 59 -65 -3 -9 -16 -49 -27 -89 -18 -59 -19 -74 -9 -87
 22 -26 43 -19 114 35 l67 52 67 -52 c71 -54 92 -61 114 -35 10 13 9 28 -9 87
 -11 40 -24 80 -27 89 -5 12 10 29 59 65 112 82 102 121 -32 125 l-85 3 -26 75
@@ -1117,14 +1277,14 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
         Height="20"
         Width="20"
         Stretch="Uniform">
-                                                        <Path.RenderTransform>
-                                                            <RotateTransform Angle="45" CenterX="8" CenterY="10"></RotateTransform>
-                                                        </Path.RenderTransform>
-                                                    </Path>
-                                                </Button>
-                                            </Grid>
-                                            <Grid Grid.Column="1">
-                                                <Button x:Name="btnPin" ToolTip="Pin this item to the list" 
+                                                            <Path.RenderTransform>
+                                                                <RotateTransform Angle="45" CenterX="8" CenterY="10"></RotateTransform>
+                                                            </Path.RenderTransform>
+                                                        </Path>
+                                                    </Button>
+                                                </Grid>
+                                                <Grid Grid.Column="1">
+                                                    <Button x:Name="btnPin" ToolTip="Pin this item to the list" 
         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}, Path=DataContext.PinCommand}"
         CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=DataContext}"
         Background="{DynamicResource DriveNavigationBtnBackgrounfColor}"
@@ -1133,7 +1293,7 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
         Margin="0 0 5 0"
         Width="20"
         Height="20">
-                                                    <Path Data="M124 212 c-6 -4 -19 -22 -28 -39 -9 -18 -22 -33 -29 -33 -6 0 -19 -4
+                                                        <Path Data="M124 212 c-6 -4 -19 -22 -28 -39 -9 -18 -22 -33 -29 -33 -6 0 -19 -4
              -27 -10 -12 -7 -11 -12 5 -29 18 -21 18 -22 -5 -46 -30 -32 -17 -45 15 -15 24
              23 25 23 46 5 17 -16 22 -17 29 -5 6 8 10 21 10 28 0 7 16 20 35 29 55 26 55
              58 -1 102 -29 23 -34 24 -50 13z m50 -41 c32 -33 29 -43 -13 -61 -17 -7 -33
@@ -1143,12 +1303,12 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
            Height="20"
            Width="20"                                                               
            Stretch="Uniform">
-                                                        <Path.RenderTransform>
-                                                            <RotateTransform Angle="270" CenterX="9" CenterY="10"></RotateTransform>
-                                                        </Path.RenderTransform>
-                                                    </Path>
-                                                </Button>
-                                                <Button x:Name="btnUnpin" ToolTip="Unpin this item from the list"
+                                                            <Path.RenderTransform>
+                                                                <RotateTransform Angle="270" CenterX="9" CenterY="10"></RotateTransform>
+                                                            </Path.RenderTransform>
+                                                        </Path>
+                                                    </Button>
+                                                    <Button x:Name="btnUnpin" ToolTip="Unpin this item from the list"
         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}, Path=DataContext.UnpinCommand}"
         CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=DataContext}"
         Background="{DynamicResource DriveNavigationBtnBackgrounfColor}"
@@ -1157,42 +1317,43 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
         Margin="0 0 5 0"
         Width="20"
         Height="20">
-                                                    <Path Data="M 1.5,1.5 C 11.426,9.75698 20.7593,18.757 29.5,28.5C 28.9984,29.521 28.3317,29.6877 27.5,29C 24.6667,26.1667 21.8333,23.3333 19,20.5C 18.2881,22.8474 17.1214,24.8474 15.5,26.5C 13.8333,25.1667 12.1667,23.8333 10.5,22.5C 2.5,29.1667 1.83333,28.5 8.5,20.5C 7.16667,18.8333 5.83333,17.1667 4.5,15.5C 6.15263,13.8786 8.15263,12.7119 10.5,12C 6.89259,8.90231 3.89259,5.40231 1.5,1.5 Z M 11.5,14.5 C 16.469,15.7763 17.469,18.443 14.5,22.5C 12.1667,20.8333 10.1667,18.8333 8.5,16.5C 9.60164,15.8243 10.6016,15.1577 11.5,14.5 Z
+                                                        <Path Data="M 1.5,1.5 C 11.426,9.75698 20.7593,18.757 29.5,28.5C 28.9984,29.521 28.3317,29.6877 27.5,29C 24.6667,26.1667 21.8333,23.3333 19,20.5C 18.2881,22.8474 17.1214,24.8474 15.5,26.5C 13.8333,25.1667 12.1667,23.8333 10.5,22.5C 2.5,29.1667 1.83333,28.5 8.5,20.5C 7.16667,18.8333 5.83333,17.1667 4.5,15.5C 6.15263,13.8786 8.15263,12.7119 10.5,12C 6.89259,8.90231 3.89259,5.40231 1.5,1.5 Z M 11.5,14.5 C 16.469,15.7763 17.469,18.443 14.5,22.5C 12.1667,20.8333 10.1667,18.8333 8.5,16.5C 9.60164,15.8243 10.6016,15.1577 11.5,14.5 Z
                M 15.5,3.5 C 16.8734,3.34332 18.2068,3.50999 19.5,4C 22,6.5 24.5,9 27,11.5C 27.8234,15.1992 26.3234,17.5325 22.5,18.5C 21.6919,18.1924 21.0253,17.6924 20.5,17C 22.0614,16.059 23.3947,14.8924 24.5,13.5C 22.4519,10.2568 19.7852,8.09009 16.5,7C 15.7894,8.25471 14.956,9.42138 14,10.5C 13.6667,10.1667 13.3333,9.83333 13,9.5C 12.9717,7.21343 13.805,5.21343 15.5,3.5 Z"
            Fill="{DynamicResource DriveNavigationBtnIcnPath}"
            Height="20"
            Width="20"
            Stretch="Uniform" />
-                                                </Button>
+                                                    </Button>
+                                                </Grid>
                                             </Grid>
-                                        </Grid>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Width="Auto"
+                                <DataGridTextColumn Width="Auto"
                                                 MinWidth="250"
                                                 Header="Date modified"
                                                 ElementStyle="{StaticResource Centering}"
                                                 Binding="{Binding LastModifiedDateTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        </DataGrid.Columns>
-                        <DataGrid.ContextMenu>
-                            <ContextMenu StaysOpen="False">
-                                <MenuItem Header="Open" Command="{Binding OpenItemCommand}"
+                            </DataGrid.Columns>
+                            <DataGrid.ContextMenu>
+                                <ContextMenu StaysOpen="False">
+                                    <MenuItem Header="Open" Command="{Binding OpenItemCommand}"
                                           CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           Height="35" />
-                                <MenuItem Header="Copy path to clipboard" Command="{Binding CopyItemPathCommand}"
+                                    <MenuItem Header="Copy path to clipboard" Command="{Binding CopyItemPathCommand}"
                                           CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           Height="35" />
-                                <MenuItem Header="Rename" Command="{Binding RenameItemCommand}"
+                                    <MenuItem Header="Rename" Command="{Binding RenameItemCommand}"
                                           CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           Height="35" />
-                                <MenuItem Header="Delete" Command="{Binding DeleteItemCommand}"
+                                    <MenuItem Header="Delete" Command="{Binding DeleteItemCommand}"
                                           CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           Height="35" />
-                            </ContextMenu>
-                        </DataGrid.ContextMenu>
-                    </DataGrid>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+                        </DataGrid>
+                    </StackPanel>
                 </Grid>
 
                 <!--Rename Window-->
