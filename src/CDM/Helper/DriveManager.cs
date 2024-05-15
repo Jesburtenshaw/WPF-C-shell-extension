@@ -90,7 +90,21 @@ namespace CDM.Helper
                     {
                         continue;
                     }
-                    drive.IsSelected = fcm.IsSelected;
+                    if (drive.IsSelected != fcm.IsSelected)
+                    {
+                        drive.IsSelected = fcm.IsSelected;
+                    }
+                }
+            }
+            else
+            {
+                if (Drives.Count(item => item.IsSelected && !string.IsNullOrEmpty(item.Code)) == 0)
+                {
+                    if (Drives.First().IsSelected) Drives.First().IsSelected = false;
+                }
+                else if (Drives.Count(item => !item.IsSelected && !string.IsNullOrEmpty(item.Code)) == 0)
+                {
+                    if (!Drives.First().IsSelected) Drives.First().IsSelected = true;
                 }
             }
             DriveIsSelectedChanged?.Invoke(sender, e);

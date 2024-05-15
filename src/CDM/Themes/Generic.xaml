@@ -17,6 +17,8 @@
     <converter:BoolVisibilityInverseConverter x:Key="BoolVisibilityInverseConverter" />
     <converter:DirFileTypeVisibilityConverter x:Key="DirFileTypeVisibilityConverter" />
     <converter:EmptyStringVisibilityConverter x:Key="EmptyStringVisibilityConverter" />
+    <converter:ZeroIntVisibilityConverter x:Key="ZeroIntVisibilityConverter" />
+    <converter:ZeroIntVisibilityInverseConverter x:Key="ZeroIntVisibilityInverseConverter" />
 
     <Style x:Key="FolderMenuItemStyle" TargetType="MenuItem">
         <Setter Property="Background"

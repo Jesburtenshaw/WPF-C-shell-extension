@@ -88,6 +88,48 @@ namespace CDM.Models
             }
         }
 
+        private int recentCount;
+        public int RecentCount
+        {
+            get
+            {
+                return recentCount;
+            }
+            set
+            {
+                recentCount = value;
+                OnPropertyChanged(nameof(RecentCount));
+            }
+        }
+
+        private int pinnedCount;
+        public int PinnedCount
+        {
+            get
+            {
+                return pinnedCount;
+            }
+            set
+            {
+                pinnedCount = value;
+                OnPropertyChanged(nameof(PinnedCount));
+            }
+        }
+
+        private int itemsCount;
+        public int ItemsCount
+        {
+            get
+            {
+                return itemsCount;
+            }
+            set
+            {
+                itemsCount = value;
+                OnPropertyChanged(nameof(ItemsCount));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)

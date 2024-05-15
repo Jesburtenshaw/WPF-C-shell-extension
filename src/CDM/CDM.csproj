@@ -65,6 +65,8 @@
     <Compile Include="Common\ExceptionHelper.cs" />
     <Compile Include="Common\IconHelper.cs" />
     <Compile Include="Common\ShortcutHelper.cs" />
+    <Compile Include="Converters\ZeroIntVisibilityInverseConverter.cs" />
+    <Compile Include="Converters\ZeroIntVisibilityConverter.cs" />
     <Compile Include="Converters\EmptyStringVisibilityConverter.cs" />
     <Compile Include="Converters\DirFileTypeVisibilityConverter.cs" />
     <Compile Include="Converters\BoolVisibilityInverseConverter.cs" />
