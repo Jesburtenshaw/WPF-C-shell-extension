@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CDM.Helper
@@ -16,11 +17,14 @@ namespace CDM.Helper
         // Path to the Taskbar pinned items folder
         private static string pinFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar");
 
-        private static ObservableCollection<FileFolderModel> PinnedItemList = new ObservableCollection<FileFolderModel>();
+        public static ObservableCollection<FileFolderModel> PinnedItemList = new ObservableCollection<FileFolderModel>();
 
         public static ObservableCollection<FileFolderModel> GetPinnedItems()
         {
-            PinnedItemList.Clear();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                PinnedItemList.Clear();
+            });
 
             // Get all files in the pinned items folder
             string[] pinnedFiles = Directory.GetFiles(pinFolder);
@@ -39,30 +43,36 @@ namespace CDM.Helper
                 {
                     FileInfo fileInfo = new FileInfo(file);
                     FileAttributes f = File.GetAttributes(file);
-                    PinnedItemList.Add(new FileFolderModel()
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        Name = fileInfo.Name,
-                        LastModifiedDateTime = fileInfo.LastWriteTime,
-                        Path = fileInfo.FullName,
-                        IconSource = IconHelper.GetIcon(fileInfo.FullName),
-                        OriginalPath = pinnedFile,
-                        IsPined = true,
-                        Type = "File"
+                        PinnedItemList.Add(new FileFolderModel()
+                        {
+                            Name = fileInfo.Name,
+                            LastModifiedDateTime = fileInfo.LastWriteTime,
+                            Path = fileInfo.FullName,
+                            IconSource = IconHelper.GetIcon(fileInfo.FullName),
+                            OriginalPath = pinnedFile,
+                            IsPined = true,
+                            Type = "File"
+                        });
                     });
                 }
                 else if (Directory.Exists(file))
                 {
                     DirectoryInfo dirInfo = new DirectoryInfo(file);
-                    PinnedItemList.Add(new FileFolderModel()
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        Name = dirInfo.Name,
-                        LastModifiedDateTime = dirInfo.LastWriteTime,
-                        Path = dirInfo.FullName,
-                        IconSource = IconHelper.GetIcon(dirInfo.FullName),
-                        OriginalPath = pinnedFile,
-                        IsPined = true,
-                        IsDefault = StarManager.IsDefault(dirInfo.FullName),
-                        Type = "Dir"
+                        PinnedItemList.Add(new FileFolderModel()
+                        {
+                            Name = dirInfo.Name,
+                            LastModifiedDateTime = dirInfo.LastWriteTime,
+                            Path = dirInfo.FullName,
+                            IconSource = IconHelper.GetIcon(dirInfo.FullName),
+                            OriginalPath = pinnedFile,
+                            IsPined = true,
+                            IsDefault = StarManager.IsDefault(dirInfo.FullName),
+                            Type = "Dir"
+                        });
                     });
                 }
 

@@ -29,6 +29,7 @@ namespace CDM.UserControls
     {
         public delegate void dlgtTest();
         public event dlgtTest EventTest;
+        private CDMViewModel vm = null;
 
         public CDMUserControl()
         {
@@ -37,7 +38,8 @@ namespace CDM.UserControls
             Application.Current.DispatcherUnhandledException += Application_DispatcherUnhandledException;
 
             InitializeComponent();
-            this.DataContext = new CDMViewModel();
+            vm = new CDMViewModel();
+            this.DataContext = vm;
             SetInitialTheme();
             
             // Subscribe to system theme changes
@@ -117,6 +119,11 @@ namespace CDM.UserControls
                 bool isDarkTheme = IsSystemInDarkMode();
                 //UpdateUIForTheme(isDarkTheme);
             }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            vm.Init();
         }
     }
 }

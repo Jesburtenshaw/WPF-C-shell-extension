@@ -28,11 +28,6 @@ namespace CDM.ViewModels
 
             //RecentItemSortCommand = new RelayCommand(RecentItemSort);
 
-            PinnedItemList = PinManager.GetPinnedItems();
-            CurFilterStatus.PinnedCount = PinnedItemList.Count;
-            RecentItemList = RecentManager.GetRecentItems();
-            CurFilterStatus.RecentCount = RecentItemList.Count;
-            DriveList = DriveManager.GetDrivesItem();
             DriveSelectedItem = new DriveModel();
             FoldersItemList = new ObservableCollection<FileFolderModel>();
             CurFolder = nullFolder;
@@ -65,9 +60,6 @@ namespace CDM.ViewModels
             IsSearchBoxPlaceholderVisible = Visibility.Visible;
             IsDriveWindowVisible = Visibility.Visible;
             IsDriveFoldersVisible = Visibility.Collapsed;
-
-            Types = FilterConditionModel.Types;
-            Drives = DriveManager.Drives;
 
             this.PropertyChanged += CDMViewModel_PropertyChanged;
             DriveManager.DriveIsSelectedChanged += DriveManager_DriveIsSelectedChanged;
@@ -381,6 +373,44 @@ namespace CDM.ViewModels
         #endregion
 
         #region :: Methods ::
+
+        public void Init()
+        {
+            PinnedItemList = PinManager.PinnedItemList;
+            RecentItemList = RecentManager.RecentItemList;
+            DriveList = DriveManager.DriveList;
+            Drives = DriveManager.Drives;
+            Types = FilterConditionModel.Types;
+
+            Task.Run(() =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CurSearchStatus.IsLoading = true;
+                    CurSearchStatus.IsLoadingDrives = true;
+                    CurSearchStatus.IsLoadingPinned = true;
+                    CurSearchStatus.IsLoadingRecent = true;
+                });
+                PinManager.GetPinnedItems();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CurFilterStatus.PinnedCount = PinnedItemList.Count;
+                    CurSearchStatus.IsLoadingPinned = false;
+                });
+                RecentManager.GetRecentItems();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CurFilterStatus.RecentCount = RecentItemList.Count;
+                    CurSearchStatus.IsLoadingRecent = false;
+                });
+                DriveManager.GetDrivesItem();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CurSearchStatus.IsLoading = false;
+                    CurSearchStatus.IsLoadingDrives = false;
+                });
+            });
+        }
 
         private void Pin(object obj)
         {
@@ -745,6 +775,15 @@ namespace CDM.ViewModels
 
         private void BackNavigationClick(object obj)
         {
+            if (CurSearchStatus.IsDoing)
+            {
+                return;
+            }
+            if (CurSearchStatus.IsLoading)
+            {
+                return;
+            }
+            CurSearchStatus.Title = "";
             curNavigatingFolderPath = "";
             ResetFilter(obj);
             FoldersItemList.Clear();
@@ -902,7 +941,7 @@ namespace CDM.ViewModels
 
         private void DoSearch(object sender)
         {
-            CurSearchStatus.IsDoing = false;
+            CurSearchStatus.IsDoing = true;
             CurSearchStatus.IsError = false;
             CurSearchStatus.Desc = "";
             if (!string.IsNullOrEmpty(TxtSearchBoxItem))
@@ -914,16 +953,23 @@ namespace CDM.ViewModels
                     CurSearchStatus.Desc = "Search items have a maximum limit of 256 characters.";
                     return;
                 }
-                if (FoldersItemList.Count > 0)
+                //if (FoldersItemList.Count > 0)
+                if (!string.IsNullOrEmpty(curNavigatingFolderPath))
                 {
                     CurFolder = nullFolder;
                     FoldersItemList.Clear();
+                    CurSearchStatus.IsLoadingItems = true;
                     Task.Run(() =>
                     {
                         DeepSearch(curNavigatingFolderPath, TxtSearchBoxItem);
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
+                            CurFilterStatus.ItemsCount = FoldersItemList.Count;
+                            CurSearchStatus.IsLoadingItems = false;
+                            CurSearchStatus.IsDoing = false;
+                        });
                     });
-                    CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
-                    CurFilterStatus.ItemsCount = FoldersItemList.Count;
                 }
                 else
                 {
@@ -933,8 +979,8 @@ namespace CDM.ViewModels
                     view = (CollectionView)CollectionViewSource.GetDefaultView(PinnedItemList);
                     view.Filter = searchItemFilter;
                     CurFilterStatus.PinnedCount = view.Count;
+                    CurSearchStatus.IsDoing = false;
                 }
-                CurSearchStatus.IsDoing = true;
             }
             else
             {
@@ -948,6 +994,11 @@ namespace CDM.ViewModels
                     Task.Run(() =>
                     {
                         NavigateToFolder(curNavigatingFolderPath);
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            ResetFilter(sender);
+                            CurSearchStatus.IsDoing = false;
+                        });
                     });
                 }
                 else
@@ -956,8 +1007,9 @@ namespace CDM.ViewModels
                     CurFilterStatus.RecentCount = RecentItemList.Count;
                     CollectionViewSource.GetDefaultView(PinnedItemList).Refresh();
                     CurFilterStatus.PinnedCount = PinnedItemList.Count;
+                    ResetFilter(sender);
+                    CurSearchStatus.IsDoing = false;
                 }
-                ResetFilter(sender);
             }
         }
 
@@ -1111,6 +1163,9 @@ namespace CDM.ViewModels
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
+                CurSearchStatus.IsLoading = true;
+                CurSearchStatus.IsLoadingItems = true;
+                CurSearchStatus.Title = folderPath;
                 curNavigatingFolderPath = folderPath;
                 ResetFilter(null);
                 FoldersItemList.Clear();
@@ -1184,7 +1239,7 @@ namespace CDM.ViewModels
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    FoldersItemList.Add(new FileFolderModel()
+                                    FoldersItemList?.Add(new FileFolderModel()
                                     {
                                         Path = fileInfo.FullName,
                                         Name = fileInfo.Name,
@@ -1208,6 +1263,8 @@ namespace CDM.ViewModels
 
             Application.Current.Dispatcher.Invoke(() =>
             {
+                CurSearchStatus.IsLoading = false;
+                CurSearchStatus.IsLoadingItems = false;
                 TxtSearchBoxItem = string.Empty;
                 IsSearchBoxPlaceholderVisible = Visibility.Visible;
                 CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();

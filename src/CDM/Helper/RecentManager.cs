@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CDM.Helper
@@ -15,11 +16,14 @@ namespace CDM.Helper
     {
         private static string recentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
 
-        private static ObservableCollection<FileFolderModel> RecentItemList = new ObservableCollection<FileFolderModel>();
+        public static ObservableCollection<FileFolderModel> RecentItemList = new ObservableCollection<FileFolderModel>();
 
         public static ObservableCollection<FileFolderModel> GetRecentItems()
         {
-            RecentItemList.Clear();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                RecentItemList.Clear();
+            });
 
             // Get all files in the Recent folder
             string[] recentFiles = Directory.GetFiles(recentFolder);
@@ -34,31 +38,37 @@ namespace CDM.Helper
                 {
                     FileInfo fileInfo = new FileInfo(file);
                     FileAttributes f = File.GetAttributes(file);
-                    RecentItemList.Add(new FileFolderModel()
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
+                        RecentItemList.Add(new FileFolderModel()
+                        {
 
-                        Name = fileInfo.Name,
-                        LastModifiedDateTime = fileInfo.LastWriteTime,
-                        Path = fileInfo.FullName,
-                        IconSource = IconHelper.GetIcon(fileInfo.FullName),
-                        OriginalPath = recentFile,
-                        IsPined = PinManager.IsPined(fileInfo.FullName),
-                        Type = "File"
+                            Name = fileInfo.Name,
+                            LastModifiedDateTime = fileInfo.LastWriteTime,
+                            Path = fileInfo.FullName,
+                            IconSource = IconHelper.GetIcon(fileInfo.FullName),
+                            OriginalPath = recentFile,
+                            IsPined = PinManager.IsPined(fileInfo.FullName),
+                            Type = "File"
+                        });
                     });
                 }
                 else if (Directory.Exists(file))
                 {
                     DirectoryInfo dirInfo = new DirectoryInfo(file);
-                    RecentItemList.Add(new FileFolderModel()
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        Name = dirInfo.Name,
-                        LastModifiedDateTime = dirInfo.LastWriteTime,
-                        Path = dirInfo.FullName,
-                        IconSource = IconHelper.GetIcon(dirInfo.FullName),
-                        OriginalPath = recentFile,
-                        IsPined = PinManager.IsPined(dirInfo.FullName),
-                        IsDefault = StarManager.IsDefault(dirInfo.FullName),
-                        Type = "Dir"
+                        RecentItemList.Add(new FileFolderModel()
+                        {
+                            Name = dirInfo.Name,
+                            LastModifiedDateTime = dirInfo.LastWriteTime,
+                            Path = dirInfo.FullName,
+                            IconSource = IconHelper.GetIcon(dirInfo.FullName),
+                            OriginalPath = recentFile,
+                            IsPined = PinManager.IsPined(dirInfo.FullName),
+                            IsDefault = StarManager.IsDefault(dirInfo.FullName),
+                            Type = "Dir"
+                        });
                     });
                 }
             }

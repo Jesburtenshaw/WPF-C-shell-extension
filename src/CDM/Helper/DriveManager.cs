@@ -7,16 +7,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CDM.Helper
 {
     public static class DriveManager
     {
-        private static ObservableCollection<DriveModel> DriveList = new ObservableCollection<DriveModel>();
+        public static ObservableCollection<DriveModel> DriveList = new ObservableCollection<DriveModel>();
         public static ObservableCollection<FilterConditionModel> Drives = new ObservableCollection<FilterConditionModel>();
 
-        public static ObservableCollection<DriveModel> GetDrivesItem()
+        public static Tuple<ObservableCollection<DriveModel>, ObservableCollection<FilterConditionModel>> GetDrivesItem()
         {
             var fcm = new FilterConditionModel
             {
@@ -24,18 +25,24 @@ namespace CDM.Helper
                 Name = "All drives"
             };
             fcm.PropertyChanged += FilterConditionModel_PropertyChanged;
-            Drives.Add(fcm);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Drives.Add(fcm);
+            });
 
             try
             {
                 DriveInfo[] drives = DriveInfo.GetDrives();//.Where(item => item.DriveType == DriveType.Network).ToArray();        
                 foreach (DriveInfo drive in drives)
                 {
-                    DriveList.Add(new DriveModel()
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        DriveName = drive.Name,//.TrimEnd('\\'),
-                        DriveDescription = drive.VolumeLabel,
-                        IsPined = PinManager.IsPined(drive.Name)
+                        DriveList.Add(new DriveModel()
+                        {
+                            DriveName = drive.Name,//.TrimEnd('\\'),
+                            DriveDescription = drive.VolumeLabel,
+                            IsPined = PinManager.IsPined(drive.Name)
+                        });
                     });
                     fcm = new FilterConditionModel
                     {
@@ -43,7 +50,10 @@ namespace CDM.Helper
                         Name = drive.Name
                     };
                     fcm.PropertyChanged += FilterConditionModel_PropertyChanged;
-                    Drives.Add(fcm);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Drives.Add(fcm);
+                    });
                 }
                 //DriveList.Add(new DriveModel()
                 //{
@@ -70,7 +80,7 @@ namespace CDM.Helper
             {
                 ExceptionHelper.ShowErrorMessage(ex);
             }
-            return DriveList;
+            return new Tuple<ObservableCollection<DriveModel>, ObservableCollection<FilterConditionModel>>(DriveList, Drives);
         }
 
         public static event EventHandler DriveIsSelectedChanged;
