@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -125,6 +126,23 @@ namespace CDM.UserControls
         {
             vm.DrivesPageSize = (Convert.ToInt32(this.ActualWidth) / 440) * (360 / 80);
             vm.Init();
+        }
+
+        private void UserControl_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+                e.Handled = true;
+            }
+        }
+
+        private void UserControl_Drop(object sender, DragEventArgs e)
+        { 
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            }
         }
     }
 }

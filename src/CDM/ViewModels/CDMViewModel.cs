@@ -955,12 +955,14 @@ namespace CDM.ViewModels
             if (directoryHistory.Count == 0)
             {
                 //cannot go back
+                CurrentDrivePath = "";
                 return;
             }
 
             //Check if current is root directory or drive
             if (directoryHistory.Count == 1 || IsRootFolder(directoryHistory.Peek()))
             {
+                CurrentDrivePath = "";
                 IsDriveWindowVisible = Visibility.Visible;
                 IsDriveFoldersVisible = Visibility.Collapsed;
                 TxtSearchBoxItem = string.Empty;

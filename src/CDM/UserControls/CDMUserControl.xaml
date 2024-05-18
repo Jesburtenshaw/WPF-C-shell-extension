@@ -7,9 +7,9 @@
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
              xmlns:converter="clr-namespace:CDM.Converters"
              xmlns:local="clr-namespace:CDM.UserControls"
-             Loaded="UserControl_Loaded"
+             Loaded="UserControl_Loaded" 
+             AllowDrop="True" DragEnter="UserControl_DragEnter" Drop="UserControl_Drop"
              mc:Ignorable="d">
-
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -673,7 +673,6 @@ S381.9,104.65,381.9,203.25z"
                     <Border Grid.Row="0">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="*"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
@@ -779,7 +778,7 @@ S381.9,104.65,381.9,203.25z"
                                         Foreground="{StaticResource WindowForegroundColor}">
                                     </TextBlock>
                                     <DataGrid x:Name="ListOfRecentItems"
-                                          Grid.Row="0"
+                                          Grid.Row="0" AllowDrop="True"
                                           Visibility="{Binding CurFilterStatus.RecentCount, Converter={StaticResource ZeroIntVisibilityConverter}}"
                                           ItemsSource="{Binding RecentItemList}"
                                           SelectedItem="{Binding SelectedRecentItem}"
@@ -1032,7 +1031,7 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
         Visibility="{Binding CurFilterStatus.PinnedCount, Converter={StaticResource ZeroIntVisibilityInverseConverter}}"
         Foreground="{StaticResource WindowForegroundColor}">
                                     </TextBlock>
-                                    <DataGrid x:Name="ListOfPinnedItems"
+                                    <DataGrid x:Name="ListOfPinnedItems" AllowDrop="True"
                                           Visibility="{Binding CurFilterStatus.PinnedCount, Converter={StaticResource ZeroIntVisibilityConverter}}"
                                           Grid.Row="1"
                                           ItemsSource="{Binding PinnedItemList}"
@@ -1415,10 +1414,12 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                               RowStyle="{StaticResource DGRowStyle}"
                               CellStyle="{StaticResource DGCellStyle}"
                               Style="{StaticResource DGStyle}"
-                              SelectionMode="Single"
-                              SelectionUnit="FullRow">
+                              SelectionMode="Single" SelectionUnit="FullRow" AllowDrop="True">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding FolderItemDoubleClickCommand}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="DragLeave">
                                 <i:InvokeCommandAction Command="{Binding FolderItemDoubleClickCommand}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
