@@ -124,7 +124,7 @@ namespace CDM.UserControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            vm.DrivesPageSize = (Convert.ToInt32(this.ActualWidth) / 440) * (360 / 80);
+            vm.DrivesPageSize = (Convert.ToInt32(this.ActualWidth - 20D) / 472) * (Convert.ToInt32((this.ActualHeight - 130D) * 0.4D) / 104);
             vm.Init();
         }
 

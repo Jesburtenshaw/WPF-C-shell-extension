@@ -34,6 +34,9 @@ namespace CDM.Models
             Types.Add(new FilterConditionModel { Code = "File", Name = "Files" });
             Types.Add(new FilterConditionModel { Code = "Dir", Name = "Folders" });
 
+            GlobalLocations = new ObservableCollection<FilterConditionModel>();
+            GlobalLocations.Add(new FilterConditionModel { Code = "", Name = "All drives" });
+
             DirveLocations = new ObservableCollection<FilterConditionModel>();
             DirveLocations.Add(new FilterConditionModel { Code = "", Name = "All drives" });
             DirveLocations.Add(new FilterConditionModel { Code = "CurDrive", Name = "This drive" });
@@ -45,6 +48,7 @@ namespace CDM.Models
         }
 
         public static ObservableCollection<FilterConditionModel> Types { get; set; }
+        public static ObservableCollection<FilterConditionModel> GlobalLocations { get; set; }
         public static ObservableCollection<FilterConditionModel> DirveLocations { get; set; }
         public static ObservableCollection<FilterConditionModel> DirectoryLocations { get; set; }
 
