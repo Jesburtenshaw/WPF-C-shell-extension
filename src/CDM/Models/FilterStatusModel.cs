@@ -38,6 +38,20 @@ namespace CDM.Models
             }
         }
 
+        private bool showLocations;
+        public bool ShowLocations
+        {
+            get
+            {
+                return showLocations;
+            }
+            set
+            {
+                showLocations = value;
+                OnPropertyChanged(nameof(ShowLocations));
+            }
+        }
+
         private string curDrives;
         public string CurDrives
         {
@@ -127,6 +141,20 @@ namespace CDM.Models
             {
                 itemsCount = value;
                 OnPropertyChanged(nameof(ItemsCount));
+            }
+        }
+
+        private int drivesCount;
+        public int DrivesCount
+        {
+            get
+            {
+                return drivesCount;
+            }
+            set
+            {
+                drivesCount = value;
+                OnPropertyChanged(nameof(DrivesCount));
             }
         }
 

@@ -73,7 +73,7 @@ namespace CDM.Helper
                 }
             }
             // Get all folders in the Recent folder
-            // string[] recentFolders = Directory.GetDirectories(recentFolderPath);
+            // string[] recentFolders = Directory.GetDirectories(recentFolderPath);            
             return RecentItemList;
         }
 

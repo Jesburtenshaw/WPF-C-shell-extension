@@ -68,6 +68,8 @@
     <Compile Include="Common\ExceptionHelper.cs" />
     <Compile Include="Common\IconHelper.cs" />
     <Compile Include="Common\ShortcutHelper.cs" />
+    <Compile Include="Converters\BoolInverseConverter.cs" />
+    <Compile Include="Converters\EmptyStringVisibilityInverseConverter.cs" />
     <Compile Include="Converters\ZeroIntVisibilityInverseConverter.cs" />
     <Compile Include="Converters\ZeroIntVisibilityConverter.cs" />
     <Compile Include="Converters\EmptyStringVisibilityConverter.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="Helper\ResourceDictionaryManager.cs" />
     <Compile Include="Helper\StarManager.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
+    <Compile Include="Models\FilterConditionModel.cs" />
     <Compile Include="Models\RenameStatusModel.cs" />
     <Compile Include="Models\FilterStatusModel.cs" />
     <Compile Include="Models\SearchStatusModel.cs" />

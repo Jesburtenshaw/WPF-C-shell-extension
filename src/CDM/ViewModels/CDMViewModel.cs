@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -28,6 +29,7 @@ namespace CDM.ViewModels
 
             //RecentItemSortCommand = new RelayCommand(RecentItemSort);
 
+            PagedDrivesList = new ObservableCollection<DriveModel>();
             DriveSelectedItem = new DriveModel();
             FoldersItemList = new ObservableCollection<FileFolderModel>();
             CurFolder = nullFolder;
@@ -52,9 +54,13 @@ namespace CDM.ViewModels
             ClearSearchErrorCommand = new RelayCommand(ClearSearchError);
             ShowDrivesCommand = new RelayCommand(ShowDrives);
             ShowTypesCommand = new RelayCommand(ShowTypes);
+            ShowLocationsCommand = new RelayCommand(ShowLocations);
             DoFilterCommand = new RelayCommand(DoFilter);
             ResetFilterCommand = new RelayCommand(ResetFilter);
             DoSearchCommand = new RelayCommand(DoSearch);
+            CancelSearchCommand = new RelayCommand(CancelSearch);
+            PrevDrivesCommand = new RelayCommand(PrevDrives);
+            NextDrivesCommand = new RelayCommand(NextDrives);
 
             //DriveCommand = new RelayCommand(driveCommand);
             IsSearchBoxPlaceholderVisible = Visibility.Visible;
@@ -63,16 +69,73 @@ namespace CDM.ViewModels
 
             this.PropertyChanged += CDMViewModel_PropertyChanged;
             DriveManager.DriveIsSelectedChanged += DriveManager_DriveIsSelectedChanged;
+
+            CurSearchStatus.PropertyChanged += SearchStatus_PropertyChanged;
+            CurFilterStatus.PropertyChanged += FilterStatus_PropertyChanged;
+        }
+
+        private void FilterStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(CurFilterStatus.DrivesCount)))
+            {
+                DrivesPagesCount = CurFilterStatus.DrivesCount % DrivesPageSize == 0 ? (CurFilterStatus.DrivesCount / DrivesPageSize) : (CurFilterStatus.DrivesCount / DrivesPageSize + 1);
+                return;
+            }
+        }
+
+        private void SearchStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(CurSearchStatus.IsDoing)))
+            {
+                CurSearchStatus.CanSearch = !CurSearchStatus.IsDoing;
+            }
         }
 
         #endregion
 
         #region :: Properties ::
 
-        public string TempFolderFileSource { get; set; }
+        public int DrivesPageSize { get; set; }
+        public int DrivesPagesCount { get; set; }
+
+        private int curDrivesPagesIndex;
+        public int CurDrivesPagesIndex
+        {
+            get { return curDrivesPagesIndex; }
+            set
+            {
+                curDrivesPagesIndex = value;
+                OnPropertyChanged(nameof(CurDrivesPagesIndex));
+            }
+        }
+
+        private bool isFirstDrivesPage = true;
+        public bool IsFirstDrivesPage
+        {
+            get { return isFirstDrivesPage; }
+            set
+            {
+                isFirstDrivesPage = value;
+                OnPropertyChanged(nameof(IsFirstDrivesPage));
+            }
+        }
+
+        private bool isLastDrivesPage = true;
+        public bool IsLastDrivesPage
+        {
+            get { return isLastDrivesPage; }
+            set
+            {
+                isLastDrivesPage = value;
+                OnPropertyChanged(nameof(IsLastDrivesPage));
+            }
+        }
+
+        private CancellationTokenSource ctsSearch;
+
         public string CurrentDrivePath { get; set; }
 
-        static Stack<string> directoryHistory = new Stack<string>();
+        private static Stack<string> directoryHistory = new Stack<string>();
 
         private DriveModel _driveSelectedItem;
         public DriveModel DriveSelectedItem
@@ -190,8 +253,8 @@ namespace CDM.ViewModels
                 OnPropertyChanged(nameof(IsDriveWindowVisible));
             }
         }
-        private Visibility _isDriveFoldersVisible;
 
+        private Visibility _isDriveFoldersVisible;
         public Visibility IsDriveFoldersVisible
         {
             get { return _isDriveFoldersVisible; }
@@ -287,6 +350,34 @@ namespace CDM.ViewModels
             }
         }
 
+        private ObservableCollection<DriveModel> pagedDrivesList;
+        public ObservableCollection<DriveModel> PagedDrivesList
+        {
+            get
+            {
+                return pagedDrivesList;
+            }
+            set
+            {
+                pagedDrivesList = value;
+                OnPropertyChanged(nameof(PagedDrivesList));
+            }
+        }
+
+        private ObservableCollection<FilterConditionModel> locations;
+        public ObservableCollection<FilterConditionModel> Locations
+        {
+            get
+            {
+                return locations;
+            }
+            set
+            {
+                locations = value;
+                OnPropertyChanged(nameof(Locations));
+            }
+        }
+
         private FilterConditionModel selectedType;
         public FilterConditionModel SelectedType
         {
@@ -298,6 +389,20 @@ namespace CDM.ViewModels
             {
                 selectedType = value;
                 OnPropertyChanged(nameof(SelectedType));
+            }
+        }
+
+        private FilterConditionModel selectedLocation;
+        public FilterConditionModel SelectedLocation
+        {
+            get
+            {
+                return selectedLocation;
+            }
+            set
+            {
+                selectedLocation = value;
+                OnPropertyChanged(nameof(SelectedLocation));
             }
         }
 
@@ -366,9 +471,13 @@ namespace CDM.ViewModels
         public RelayCommand ClearSearchErrorCommand { get; set; }
         public RelayCommand ShowDrivesCommand { get; set; }
         public RelayCommand ShowTypesCommand { get; set; }
+        public RelayCommand ShowLocationsCommand { get; set; }
         public RelayCommand DoFilterCommand { get; set; }
         public RelayCommand ResetFilterCommand { get; set; }
         public RelayCommand DoSearchCommand { get; set; }
+        public RelayCommand CancelSearchCommand { get; set; }
+        public RelayCommand PrevDrivesCommand { get; set; }
+        public RelayCommand NextDrivesCommand { get; set; }
 
         #endregion
 
@@ -406,10 +515,34 @@ namespace CDM.ViewModels
                 DriveManager.GetDrivesItem();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    CurFilterStatus.DrivesCount = DriveList.Count;
+                    if (CurFilterStatus.DrivesCount > 0)
+                    {
+                        CurDrivesPagesIndex = 1;
+                    }
+
                     CurSearchStatus.IsLoading = false;
                     CurSearchStatus.IsLoadingDrives = false;
                 });
             });
+        }
+
+        private void PrevDrives(object sender)
+        {
+            if (CurDrivesPagesIndex <= 1)
+            {
+                return;
+            }
+            CurDrivesPagesIndex--;
+        }
+
+        private void NextDrives(object sender)
+        {
+            if (CurDrivesPagesIndex >= DrivesPagesCount)
+            {
+                return;
+            }
+            CurDrivesPagesIndex++;
         }
 
         private void Pin(object obj)
@@ -752,6 +885,10 @@ namespace CDM.ViewModels
 
         private void ClearSearch(object obj)
         {
+            if (!CurSearchStatus.CanSearch)
+            {
+                return;
+            }
             TxtSearchBoxItem = "";
         }
 
@@ -764,17 +901,43 @@ namespace CDM.ViewModels
         private void ShowDrives(object obj)
         {
             curFilterStatus.ShowDrives = !curFilterStatus.ShowDrives;
-            if (curFilterStatus.ShowDrives) curFilterStatus.ShowTypes = !curFilterStatus.ShowDrives;
+            if (curFilterStatus.ShowDrives)
+            {
+                curFilterStatus.ShowTypes = !curFilterStatus.ShowDrives;
+                curFilterStatus.ShowLocations = !curFilterStatus.ShowDrives;
+            }
         }
 
         private void ShowTypes(object obj)
         {
             curFilterStatus.ShowTypes = !curFilterStatus.ShowTypes;
-            if (curFilterStatus.ShowTypes) curFilterStatus.ShowDrives = !curFilterStatus.ShowTypes;
+            if (curFilterStatus.ShowTypes)
+            {
+                curFilterStatus.ShowDrives = !curFilterStatus.ShowTypes;
+                curFilterStatus.ShowLocations = !curFilterStatus.ShowTypes;
+            }
+        }
+
+        private void ShowLocations(object obj)
+        {
+            curFilterStatus.ShowLocations = !curFilterStatus.ShowLocations;
+            if (curFilterStatus.ShowLocations)
+            {
+                curFilterStatus.ShowDrives = !curFilterStatus.ShowLocations;
+                curFilterStatus.ShowTypes = !curFilterStatus.ShowLocations;
+            }
+        }
+
+        private void HideAllPopups()
+        {
+            if (CurFilterStatus.ShowTypes) CurFilterStatus.ShowTypes = !CurFilterStatus.ShowTypes;
+            if (CurFilterStatus.ShowDrives) CurFilterStatus.ShowDrives = !CurFilterStatus.ShowDrives;
+            if (CurFilterStatus.ShowLocations) CurFilterStatus.ShowLocations = !CurFilterStatus.ShowLocations;
         }
 
         private void BackNavigationClick(object obj)
         {
+            HideAllPopups();
             if (CurSearchStatus.IsDoing)
             {
                 return;
@@ -784,6 +947,7 @@ namespace CDM.ViewModels
                 return;
             }
             CurSearchStatus.Title = "";
+            CurSearchStatus.Searched = false;
             curNavigatingFolderPath = "";
             ResetFilter(obj);
             FoldersItemList.Clear();
@@ -863,8 +1027,12 @@ namespace CDM.ViewModels
             //CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
         }
 
-        private void DeepSearch(string folderPath, string keyword)
+        private void DeepSearch(string folderPath, string keyword, CancellationToken ct)
         {
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
             // Check if the folder exists
             if (!Directory.Exists(folderPath))
             {
@@ -873,10 +1041,18 @@ namespace CDM.ViewModels
 
             try
             {
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
                 //Get subfolders
                 string[] subDirectories = Directory.GetDirectories(folderPath);
                 foreach (string subFolder in subDirectories)
                 {
+                    if (ct.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     DirectoryInfo subFolderInfo = new DirectoryInfo(subFolder);
                     if (!subFolderInfo.Attributes.ToString().Contains(FileAttributes.Hidden.ToString()) &&
                !subFolderInfo.Attributes.ToString().Contains(FileAttributes.NotContentIndexed.ToString()) &&
@@ -898,7 +1074,7 @@ namespace CDM.ViewModels
                                 });
                             });
                         }
-                        DeepSearch(subFolder, keyword);
+                        DeepSearch(subFolder, keyword, ct);
                     }
                 }
             }
@@ -906,16 +1082,24 @@ namespace CDM.ViewModels
 
             try
             {
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
                 //Get files
                 string[] files = Directory.GetFiles(folderPath);
                 foreach (string file in files)
                 {
+                    if (ct.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     if (Path.GetFileName(file).IndexOf(keyword, StringComparison.OrdinalIgnoreCase) < 0)
                     {
                         continue;
                     }
-                    FileInfo fileInfo = new FileInfo(file);
 
+                    FileInfo fileInfo = new FileInfo(file);
                     if (!fileInfo.Attributes.ToString().Contains(FileAttributes.Hidden.ToString()) &&
                 !fileInfo.Attributes.ToString().Contains(FileAttributes.NotContentIndexed.ToString()) &&
                 !fileInfo.Attributes.ToString().Contains(FileAttributes.ReparsePoint.ToString()))
@@ -941,8 +1125,14 @@ namespace CDM.ViewModels
 
         private void DoSearch(object sender)
         {
+            if (!CurSearchStatus.CanSearch)
+            {
+                return;
+            }
+
             CurSearchStatus.IsDoing = true;
             CurSearchStatus.IsError = false;
+            CurSearchStatus.Searched = false;
             CurSearchStatus.Desc = "";
             if (!string.IsNullOrEmpty(TxtSearchBoxItem))
             {
@@ -959,15 +1149,40 @@ namespace CDM.ViewModels
                     CurFolder = nullFolder;
                     FoldersItemList.Clear();
                     CurSearchStatus.IsLoadingItems = true;
+
+                    ctsSearch?.Cancel();
+                    ctsSearch = null;
+                    ctsSearch = new CancellationTokenSource();
+
                     Task.Run(() =>
                     {
-                        DeepSearch(curNavigatingFolderPath, TxtSearchBoxItem);
+                        List<string> dests = new List<string>();
+                        if (SelectedLocation.Code == "CurDir")
+                        {
+                            dests.Add(curNavigatingFolderPath);
+                        }
+                        else if (SelectedLocation.Code == "CurDrive")
+                        {
+                            dests.Add(CurrentDrivePath);
+                        }
+                        else
+                        {
+                            foreach (var drive in DriveList)
+                            {
+                                dests.Add(drive.DriveName);
+                            }
+                        }
+                        foreach (var dest in dests)
+                        {
+                            DeepSearch(dest, TxtSearchBoxItem, ctsSearch.Token);
+                        }
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             CollectionViewSource.GetDefaultView(FoldersItemList).Refresh();
                             CurFilterStatus.ItemsCount = FoldersItemList.Count;
                             CurSearchStatus.IsLoadingItems = false;
                             CurSearchStatus.IsDoing = false;
+                            CurSearchStatus.Searched = true;
                         });
                     });
                 }
@@ -1011,6 +1226,11 @@ namespace CDM.ViewModels
                     CurSearchStatus.IsDoing = false;
                 }
             }
+        }
+
+        private void CancelSearch(object sender)
+        {
+            ctsSearch?.Cancel();
         }
 
         private void searchBoxTextChanged(object sender)
@@ -1161,15 +1381,20 @@ namespace CDM.ViewModels
         private string curNavigatingFolderPath = "";
         public void NavigateToFolder(string folderPath)
         {
+            var isRoot = IsRootFolder(folderPath);
             Application.Current.Dispatcher.Invoke(() =>
             {
+                HideAllPopups();
                 CurSearchStatus.IsLoading = true;
                 CurSearchStatus.IsLoadingItems = true;
                 CurSearchStatus.Title = folderPath;
+                CurSearchStatus.Searched = false;
                 curNavigatingFolderPath = folderPath;
                 ResetFilter(null);
                 FoldersItemList.Clear();
                 TxtSearchBoxItem = "";
+                Locations = isRoot ? FilterConditionModel.DirveLocations : FilterConditionModel.DirectoryLocations;
+                SelectedLocation = Locations.Last();
             });
 
             if (!string.IsNullOrEmpty(folderPath))
@@ -1177,7 +1402,7 @@ namespace CDM.ViewModels
                 // Check if the folder exists
                 if (Directory.Exists(folderPath))
                 {
-                    if (!IsRootFolder(folderPath))
+                    if (!isRoot)
                     {
                         var curDir = new DirectoryInfo(folderPath);
                         Application.Current.Dispatcher.Invoke(() =>
@@ -1313,8 +1538,27 @@ namespace CDM.ViewModels
         {
             if (e.PropertyName.Equals(nameof(SelectedType)))
             {
+                if (CurFilterStatus.ShowTypes) CurFilterStatus.ShowTypes = !CurFilterStatus.ShowTypes;
                 CurFilterStatus.CurType = string.IsNullOrEmpty(SelectedType?.Code) ? "" : SelectedType?.Name;
                 DoFilter(sender);
+                return;
+            }
+            if (e.PropertyName.Equals(nameof(SelectedLocation)))
+            {
+                if (CurFilterStatus.ShowLocations) CurFilterStatus.ShowLocations = !CurFilterStatus.ShowLocations;
+                return;
+            }
+            if (e.PropertyName.Equals(nameof(CurDrivesPagesIndex)))
+            {
+                IsFirstDrivesPage = CurDrivesPagesIndex == 1;
+                IsLastDrivesPage = CurDrivesPagesIndex == DrivesPagesCount;
+                var list = DriveList.Skip((CurDrivesPagesIndex - 1) * DrivesPageSize).Take(DrivesPageSize);
+                PagedDrivesList.Clear();
+                foreach (var item in list)
+                {
+                    PagedDrivesList.Add(item);
+                }
+                return;
             }
         }
 
@@ -1343,10 +1587,6 @@ namespace CDM.ViewModels
 
         private bool filter(object item)
         {
-            if (!CurSearchStatus.IsDoing)
-            {
-                return true;
-            }
             var SelectedDrives = Drives.Where(ele => ele.IsSelected).ToList();
             if ((null == SelectedDrives || SelectedDrives.Count == 0) && (null == SelectedType || string.IsNullOrEmpty(SelectedType.Code)))
             {
@@ -1378,10 +1618,7 @@ namespace CDM.ViewModels
                 drive.IsSelected = false;
             }
             SelectedType = null;
-            if (CurSearchStatus.IsDoing)
-            {
-                DoFilter(obj);
-            }
+            DoFilter(obj);
         }
 
         // File icon set

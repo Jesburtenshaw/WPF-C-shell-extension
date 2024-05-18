@@ -15,8 +15,10 @@
     <!--<converter:ArrowPathConverter x:Key="ArrowPathConverter" />-->
     <converter:BoolVisibilityConverter x:Key="BoolVisibilityConverter" />
     <converter:BoolVisibilityInverseConverter x:Key="BoolVisibilityInverseConverter" />
+    <converter:BoolInverseConverter x:Key="BoolInverseConverter" />
     <converter:DirFileTypeVisibilityConverter x:Key="DirFileTypeVisibilityConverter" />
     <converter:EmptyStringVisibilityConverter x:Key="EmptyStringVisibilityConverter" />
+    <converter:EmptyStringVisibilityInverseConverter x:Key="EmptyStringVisibilityInverseConverter" />
     <converter:ZeroIntVisibilityConverter x:Key="ZeroIntVisibilityConverter" />
     <converter:ZeroIntVisibilityInverseConverter x:Key="ZeroIntVisibilityInverseConverter" />
 

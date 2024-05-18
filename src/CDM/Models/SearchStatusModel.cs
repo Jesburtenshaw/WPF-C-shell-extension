@@ -52,6 +52,20 @@ namespace CDM.Models
             }
         }
 
+        private bool searched;
+        public bool Searched
+        {
+            get
+            {
+                return searched;
+            }
+            set
+            {
+                searched = value;
+                OnPropertyChanged(nameof(Searched));
+            }
+        }
+
         private bool canSearch;
         public bool CanSearch
         {

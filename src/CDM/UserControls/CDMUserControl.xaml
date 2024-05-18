@@ -15,10 +15,13 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDM;component\Themes\Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <!--<converter:ArrowPathConverter x:Key="ArrowPathConverter" />-->
             <converter:BoolVisibilityConverter x:Key="BoolVisibilityConverter" />
             <converter:BoolVisibilityInverseConverter x:Key="BoolVisibilityInverseConverter" />
+            <converter:BoolInverseConverter x:Key="BoolInverseConverter" />
             <converter:DirFileTypeVisibilityConverter x:Key="DirFileTypeVisibilityConverter" />
             <converter:EmptyStringVisibilityConverter x:Key="EmptyStringVisibilityConverter" />
+            <converter:EmptyStringVisibilityInverseConverter x:Key="EmptyStringVisibilityInverseConverter" />
             <converter:ZeroIntVisibilityConverter x:Key="ZeroIntVisibilityConverter" />
             <converter:ZeroIntVisibilityInverseConverter x:Key="ZeroIntVisibilityInverseConverter" />
         </ResourceDictionary>
@@ -392,7 +395,6 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                 </Border>
 
                 <Grid Grid.Row="1">
-
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -401,9 +403,9 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
@@ -495,7 +497,7 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                              ClipToBounds="True"
                              CornerRadius="0,0,0,0"
                              Visibility="{Binding TxtSearchBoxItem, Converter={StaticResource EmptyStringVisibilityConverter}}">
-                            <Button
+                            <Button IsEnabled="{Binding CurSearchStatus.CanSearch}"
                                 Command="{Binding ClearSearchCommand}"
                                 Background="Transparent"
                                 BorderThickness="1" Cursor="Hand"
@@ -511,6 +513,7 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
 
                         <Border BorderBrush="{DynamicResource SeachBoxBorderColor}"
                                 Background="{DynamicResource SeachBoxBackgroundColor}"
+                                Visibility="{Binding IsDriveWindowVisible}"
                                 BorderThickness="0 1 1 1"
                                 Grid.Column="2"
                                 Height="40"
@@ -518,42 +521,143 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                 HorizontalAlignment="Right"
                                 ClipToBounds="True"
                                 CornerRadius="0,3,3,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Button x:Name="purchasedBookSearchBtn"
+                            <Button x:Name="purchasedBookSearchBtn" IsEnabled="{Binding CurSearchStatus.CanSearch}"
                                         Command="{Binding DoSearchCommand}"
                                         Style="{StaticResource btnSearch}">
-                                    <!--<Image Source="/Resources/icnsearch.png"
+                                <!--<Image Source="/Resources/icnsearch.png"
                                            Height="14"
                                            Width="14">
                                     </Image>-->
-                                    <Path Data="M0,203.25c0,112.1,91.2,203.2,203.2,203.2c51.6,0,98.8-19.4,134.7-51.2l129.5,129.5c2.4,2.4,5.5,3.6,8.7,3.6
+                                <Path Data="M0,203.25c0,112.1,91.2,203.2,203.2,203.2c51.6,0,98.8-19.4,134.7-51.2l129.5,129.5c2.4,2.4,5.5,3.6,8.7,3.6
 			    s6.3-1.2,8.7-3.6c4.8-4.8,4.8-12.5,0-17.3l-129.6-129.5c31.8-35.9,51.2-83,51.2-134.7c0-112.1-91.2-203.2-203.2-203.2
 			    S0,91.15,0,203.25z M381.9,203.25c0,98.5-80.2,178.7-178.7,178.7s-178.7-80.2-178.7-178.7s80.2-178.7,178.7-178.7
 			    S381.9,104.65,381.9,203.25z"
                                           Stretch="Uniform"
                                           Height="14"
                                           Style="{StaticResource IcnPathStyle}" />
+                            </Button>
+                        </Border>
+                        <Border BorderBrush="{DynamicResource SeachBoxBorderColor}"
+                Background="{DynamicResource SeachBoxBackgroundColor}"
+                Visibility="{Binding IsDriveFoldersVisible}"
+                BorderThickness="0 1 0 1"
+                Grid.Column="2"
+                Height="40"
+                Width="40"
+                HorizontalAlignment="Right"
+                ClipToBounds="True"
+                CornerRadius="0,0,0,0">
+                            <Button IsEnabled="{Binding CurSearchStatus.CanSearch}"
+                        Command="{Binding DoSearchCommand}"
+                        Style="{StaticResource btnSearch}">
+                                <!--<Image Source="/Resources/icnsearch.png"
+                           Height="14"
+                           Width="14">
+                    </Image>-->
+                                <Path Data="M0,203.25c0,112.1,91.2,203.2,203.2,203.2c51.6,0,98.8-19.4,134.7-51.2l129.5,129.5c2.4,2.4,5.5,3.6,8.7,3.6
+s6.3-1.2,8.7-3.6c4.8-4.8,4.8-12.5,0-17.3l-129.6-129.5c31.8-35.9,51.2-83,51.2-134.7c0-112.1-91.2-203.2-203.2-203.2
+S0,91.15,0,203.25z M381.9,203.25c0,98.5-80.2,178.7-178.7,178.7s-178.7-80.2-178.7-178.7s80.2-178.7,178.7-178.7
+S381.9,104.65,381.9,203.25z"
+                          Stretch="Uniform"
+                          Height="14"
+                          Style="{StaticResource IcnPathStyle}" />
+                            </Button>
+                        </Border>
+
+                        <Border BorderBrush="{DynamicResource SeachBoxBorderColor}"
+                Background="{DynamicResource SeachBoxBackgroundColor}"
+                Visibility="{Binding IsDriveFoldersVisible}"
+                BorderThickness="0 1 1 1"
+                Grid.Column="3"
+                Height="40"
+                Width="20"
+                HorizontalAlignment="Right"
+                ClipToBounds="True"
+                CornerRadius="0,3,3,0">
+                            <Grid>
+                            <Button IsEnabled="{Binding CurSearchStatus.CanSearch}"
+                                Visibility="{Binding CurFilterStatus.ShowLocations, Converter={StaticResource BoolVisibilityInverseConverter}}"
+    Command="{Binding ShowLocationsCommand}"
+    Background="Transparent"
+    VerticalAlignment="Center" HorizontalAlignment="Center"
+    BorderThickness="1" Cursor="Hand"
+    Style="{StaticResource btnSearch}"
+    Foreground="{DynamicResource WindowForegroundColor}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="∨" FontSize="22" FontWeight="Thin">
+                                        </TextBlock>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Button Name="btnLocations" IsEnabled="{Binding CurSearchStatus.CanSearch}"
+                                Visibility="{Binding CurFilterStatus.ShowLocations, Converter={StaticResource BoolVisibilityConverter}}"
+    Command="{Binding ShowLocationsCommand}"
+    Background="Transparent"
+    VerticalAlignment="Center" HorizontalAlignment="Center"
+    BorderThickness="1" Cursor="Hand"
+    Style="{StaticResource btnSearch}"
+    Foreground="{DynamicResource WindowForegroundColor}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="∧" FontSize="22" FontWeight="Thin">
+                                        </TextBlock>
+                                    </ControlTemplate>
+                                </Button.Template>
                                 </Button>
-                                <TextBlock Text="Searching..." Margin="5,0,0,0"
-                                           Visibility="{Binding CurSearchStatus.IsDoing, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Foreground="{StaticResource WindowForegroundColor}">
-                                </TextBlock>
-                                <Button Margin="5,0,0,0"
-                                    Visibility="{Binding CurSearchStatus.IsDoing, Converter={StaticResource BoolVisibilityConverter}}"
-                                    Command="{Binding CancelSearchCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0" Cursor="Hand"
-                                    Foreground="{DynamicResource WindowForegroundColor}">
-                                    <Button.Template>
-                                        <ControlTemplate>
-                                            <TextBlock Text="Cancel" FontSize="30" FontWeight="Thin">
-                                            </TextBlock>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-                            </StackPanel>
+                                <Popup Name="popupLocations" IsOpen="{Binding CurFilterStatus.ShowLocations}"
+   PlacementTarget="{Binding ElementName=btnLocations}"
+   Placement="Bottom" VerticalOffset="-1" >
+                                    <Border Margin="0 0 0 0"
+        BorderThickness="0"
+        BorderBrush="#6b6b6b"
+        CornerRadius="3"
+        Width="130"
+        Height="Auto"
+        VerticalAlignment="Stretch"
+        HorizontalAlignment="Stretch">
+                                        <ListView SelectionMode="Single" FontSize="16" 
+                      ItemsSource="{Binding Locations}"
+                      SelectedItem="{Binding SelectedLocation,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                Background="{DynamicResource WindowBackgroundColor}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Foreground="{DynamicResource WindowForegroundColor}" VerticalAlignment="Center" Text="{Binding Name}"></TextBlock>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Border>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeave">
+                                            <i:InvokeCommandAction Command="{Binding ShowLocationsCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Popup>
+                            </Grid>
                         </Border>
                     </Grid>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <TextBlock Text="Searching..." Margin="5,0,0,0"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding CurSearchStatus.IsDoing, Converter={StaticResource BoolVisibilityConverter}}"
+                               Foreground="{StaticResource WindowForegroundColor}">
+                        </TextBlock>
+                        <Button Margin="5,0,0,0"
+                    Visibility="{Binding CurSearchStatus.IsDoing, Converter={StaticResource BoolVisibilityConverter}}"
+                    Command="{Binding CancelSearchCommand}"
+                    Background="Transparent"
+                    VerticalAlignment="Center"
+                    BorderThickness="0" Cursor="Hand"
+                    Foreground="{DynamicResource WindowForegroundColor}">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <TextBlock VerticalAlignment="Center" Text="Cancel" FontSize="12" Foreground="#A0B8EC" FontWeight="Thin">
+                                    </TextBlock>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
                 </Grid>
 
                 <!--Mainwindow-->
@@ -569,12 +673,18 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                     <Border Grid.Row="0">
                         <Grid>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition Height="*"></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
+                            <TextBlock Margin="0,0,0,10" Grid.Row="0"
+                                        Text="We didn't find anything to show here." FontWeight="Thin" FontSize="14"
+                                        Visibility="{Binding CurFilterStatus.DrivesCount, Converter={StaticResource ZeroIntVisibilityInverseConverter}}"
+                                        Foreground="{StaticResource WindowForegroundColor}">
+                            </TextBlock>
                             <!--Style="{StaticResource BookListViewStyle}"-->
                             <ListView ItemTemplate="{StaticResource DriveTemplateStyle}" Grid.Row="0"
-                                  ItemsSource="{Binding DriveList,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding PagedDrivesList,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemContainerStyle="{StaticResource driveListViewItemStyle}"
                                   VerticalAlignment="Top"
                                   BorderBrush="Transparent"
@@ -613,9 +723,10 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                 Height="36"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right">
-                        <Button x:Name="Left"
+                        <Button x:Name="Left" Command="{Binding PrevDrivesCommand}"
+                                Visibility="{Binding IsFirstDrivesPage,Converter={StaticResource BoolVisibilityInverseConverter}}"
                                 Background="{DynamicResource DriveNavigationBtnBackgrounfColor}"
-                                BorderThickness="0" IsEnabled="False"
+                                BorderThickness="0"
                                 Margin="0 0 5 0"
                                 Width="36"
                                 Height="36">
@@ -628,9 +739,10 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                         <!--Content="&lt;"-->
 
                         <!--Content="&gt;"-->
-                        <Button x:Name="Right"
+                        <Button x:Name="Right" Command="{Binding NextDrivesCommand}"
+                                Visibility="{Binding IsLastDrivesPage,Converter={StaticResource BoolVisibilityInverseConverter}}"
                                 Background="{DynamicResource DriveNavigationBtnBackgrounfColor}"
-                                BorderThickness="0" IsEnabled="False"
+                                BorderThickness="0"
                                 Width="36"
                                 Height="36">
                             <Path Data="M290.909091 983.272727a29.090909 29.090909 0 0 1-20.596364-49.570909L689.92 512l-418.909091-421.701818a29.090909 29.090909 0 0 1 41.309091-40.96l439.505455 442.181818a29.090909 29.090909 0 0 1 0 40.96l-439.505455 442.181818a28.974545 28.974545 0 0 1-21.410909 8.610909z"
@@ -638,7 +750,6 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                   Height="20"
                                   Width="20"
                                   Stretch="Uniform" />
-
                         </Button>
 
                     </StackPanel>
@@ -1127,7 +1238,7 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                         <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Border BorderBrush="#6b6b6b" BorderThickness="0 2 0 2" Grid.Row="0"
-                             Visibility="{Binding CurSearchStatus.IsDoing, Converter={StaticResource BoolVisibilityConverter}}">
+                             Visibility="{Binding CurSearchStatus.Searched, Converter={StaticResource BoolVisibilityConverter}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -1213,6 +1324,11 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                             </ListView.ItemTemplate>
                                         </ListView>
                                     </Border>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeave">
+                                            <i:InvokeCommandAction Command="{Binding ShowDrivesCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                                 </Popup>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Grid.Column="2">
@@ -1265,6 +1381,11 @@ c-31 91 -37 100 -61 100 -10 0 -22 -6 -27 -12z"
                                             </ListView.ItemTemplate>
                                         </ListView>
                                     </Border>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeave">
+                                            <i:InvokeCommandAction Command="{Binding ShowTypesCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                                 </Popup>
                             </StackPanel>
                             <Button Grid.Column="3"
