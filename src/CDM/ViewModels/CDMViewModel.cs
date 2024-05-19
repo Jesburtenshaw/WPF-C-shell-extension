@@ -146,8 +146,11 @@ namespace CDM.ViewModels
             }
             set
             {
-                _driveSelectedItem = value;
-                OnPropertyChanged(nameof(DriveSelectedItem));
+                if (null != value)
+                {
+                    _driveSelectedItem = value;
+                    OnPropertyChanged(nameof(DriveSelectedItem));
+                }
             }
         }
 
@@ -193,8 +196,11 @@ namespace CDM.ViewModels
             get { return _selectedRecentItem; }
             set
             {
-                _selectedRecentItem = value;
-                OnPropertyChanged(nameof(SelectedRecentItem));
+                if (null != value)
+                {
+                    _selectedRecentItem = value;
+                    OnPropertyChanged(nameof(SelectedRecentItem));
+                }
             }
         }
 
@@ -204,9 +210,11 @@ namespace CDM.ViewModels
             get { return _selectedPinnedItem; }
             set
             {
-                _selectedPinnedItem = value;
-
-                OnPropertyChanged(nameof(SelectedPinnedItem));
+                if (null != value)
+                {
+                    _selectedPinnedItem = value;
+                    OnPropertyChanged(nameof(SelectedPinnedItem));
+                }
             }
         }
 
@@ -238,8 +246,11 @@ namespace CDM.ViewModels
             get { return _selectedFileFolderItem; }
             set
             {
-                _selectedFileFolderItem = value;
-                OnPropertyChanged(nameof(SelectedFileFolderItem));
+                if (null != value)
+                {
+                    _selectedFileFolderItem = value;
+                    OnPropertyChanged(nameof(SelectedFileFolderItem));
+                }
             }
         }
 

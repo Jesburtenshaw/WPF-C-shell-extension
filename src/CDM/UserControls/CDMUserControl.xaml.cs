@@ -138,10 +138,11 @@ namespace CDM.UserControls
         }
 
         private void UserControl_Drop(object sender, DragEventArgs e)
-        { 
+        {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                e.Handled = true;
             }
         }
     }
