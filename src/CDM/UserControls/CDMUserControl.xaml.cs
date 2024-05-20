@@ -145,5 +145,19 @@ namespace CDM.UserControls
                 e.Handled = true;
             }
         }
+
+        private void UserControl_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (vm.CurFilterStatus.ShowDrives) vm.CurFilterStatus.ShowDrives = false;
+            if (vm.CurFilterStatus.ShowTypes) vm.CurFilterStatus.ShowTypes = false;
+            if (vm.CurFilterStatus.ShowLocations) vm.CurFilterStatus.ShowLocations = false;
+        }
+
+        private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (vm.CurFilterStatus.ShowDrives) vm.CurFilterStatus.ShowDrives = false;
+            if (vm.CurFilterStatus.ShowTypes) vm.CurFilterStatus.ShowTypes = false;
+            if (vm.CurFilterStatus.ShowLocations) vm.CurFilterStatus.ShowLocations = false;
+        }
     }
 }

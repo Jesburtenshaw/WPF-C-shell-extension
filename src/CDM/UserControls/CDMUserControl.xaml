@@ -7,7 +7,7 @@
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
              xmlns:converter="clr-namespace:CDM.Converters"
              xmlns:local="clr-namespace:CDM.UserControls"
-             Loaded="UserControl_Loaded" 
+             Loaded="UserControl_Loaded" PreviewMouseDown="UserControl_PreviewMouseDown" PreviewKeyDown="UserControl_PreviewKeyDown"
              AllowDrop="True" DragEnter="UserControl_DragEnter" Drop="UserControl_Drop"
              mc:Ignorable="d">
     <UserControl.Resources>
