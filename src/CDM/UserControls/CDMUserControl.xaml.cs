@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Linq;
 using System.Management;
 using System.Text;
@@ -152,6 +153,10 @@ namespace CDM.UserControls
 
         private void UserControl_DragEnter(object sender, DragEventArgs e)
         {
+            var allowDragAndDrop = ConfigurationManager.AppSettings["AllowDragAndDrop"] == "true";
+            if (!allowDragAndDrop) return;
+
+            e.Handled = true;
             if (e.Data.GetDataPresent(DataFormats.FileDrop) || e.Data.GetDataPresent("Shell IDList Array"))
             {
                 e.Effects = DragDropEffects.Copy;
@@ -164,7 +169,19 @@ namespace CDM.UserControls
 
         private void UserControl_Drop(object sender, DragEventArgs e)
         {
-             if (e.Data.GetDataPresent("Shell IDList Array"))
+            var allowDragAndDrop = ConfigurationManager.AppSettings["AllowDragAndDrop"] == "true";
+            if (!allowDragAndDrop) return;
+
+            e.Handled = true;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string file in files)
+                {
+                    // Do something with the file (e.g., display the file path in the TextBox)
+                }
+            }
+            else if (e.Data.GetDataPresent("Shell IDList Array"))
             {
                 var shellObjects = (System.Runtime.InteropServices.ComTypes.IDataObject)e.Data.GetData("Shell IDList Array");
                 // Process shell objects (e.g., display their names in the TextBox)
@@ -180,13 +197,11 @@ namespace CDM.UserControls
                 return;
 
             var dataFormat = DataFormats.GetDataFormat("Shell IDList Array");
-            
             //if (shellObjects.GetDataPresent(dataFormat.Name))
             //{
             //    var obj = shellObjects.GetData(dataFormat.Name);
             //    // Handle the shell objects (e.g., display their names in the TextBox)
             //    // This part will require additional processing to extract useful information
-            //    textBox.Text += "Shell object dropped." + Environment.NewLine;
             //}
         }
 
