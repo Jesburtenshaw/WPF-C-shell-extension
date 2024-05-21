@@ -290,6 +290,20 @@ namespace CDM.ViewModels
             }
         }
 
+        private bool offline;
+        public bool Offline
+        {
+            get
+            {
+                return offline;
+            }
+            set
+            {
+                offline = value;
+                OnPropertyChanged(nameof(Offline));
+            }
+        }
+
         private FileFolderModel nullFolder = new FileFolderModel();
         private FileFolderModel curFolder;
         public FileFolderModel CurFolder
@@ -909,13 +923,32 @@ namespace CDM.ViewModels
             CurSearchStatus.Desc = "";
         }
 
+        public bool EntereingDrives { get; set; } = false;
         private void ShowDrives(object obj)
         {
-            curFilterStatus.ShowDrives = !curFilterStatus.ShowDrives;
-            if (curFilterStatus.ShowDrives)
+            var str = obj as string;
+            switch (str)
             {
-                curFilterStatus.ShowTypes = !curFilterStatus.ShowDrives;
-                curFilterStatus.ShowLocations = !curFilterStatus.ShowDrives;
+                case "MouseEnter":
+                    EntereingDrives = true;
+                    break;
+                case "MouseLeave":
+                    EntereingDrives = false;
+                    break;
+                case "MouseDown":
+                    if (!EntereingDrives)
+                    {
+                        curFilterStatus.ShowDrives = false;
+                    }
+                    break;
+                default:                    
+                    curFilterStatus.ShowDrives = !curFilterStatus.ShowDrives;
+                    if (curFilterStatus.ShowDrives)
+                    {
+                        curFilterStatus.ShowTypes = !curFilterStatus.ShowDrives;
+                        curFilterStatus.ShowLocations = !curFilterStatus.ShowDrives;
+                    }
+                    break;
             }
         }
 
@@ -1241,7 +1274,7 @@ namespace CDM.ViewModels
             }
         }
 
-        private void CancelSearch(object sender)
+        public void CancelSearch(object sender)
         {
             ctsSearch?.Cancel();
         }
@@ -1551,14 +1584,14 @@ namespace CDM.ViewModels
         {
             if (e.PropertyName.Equals(nameof(SelectedType)))
             {
-                if (CurFilterStatus.ShowTypes) CurFilterStatus.ShowTypes = !CurFilterStatus.ShowTypes;
+                //if (CurFilterStatus.ShowTypes) CurFilterStatus.ShowTypes = !CurFilterStatus.ShowTypes;
                 CurFilterStatus.CurType = string.IsNullOrEmpty(SelectedType?.Code) ? "" : SelectedType?.Name;
                 DoFilter(sender);
                 return;
             }
             if (e.PropertyName.Equals(nameof(SelectedLocation)))
             {
-                if (CurFilterStatus.ShowLocations) CurFilterStatus.ShowLocations = !CurFilterStatus.ShowLocations;
+                //if (CurFilterStatus.ShowLocations) CurFilterStatus.ShowLocations = !CurFilterStatus.ShowLocations;
                 return;
             }
             if (e.PropertyName.Equals(nameof(CurDrivesPagesIndex)))

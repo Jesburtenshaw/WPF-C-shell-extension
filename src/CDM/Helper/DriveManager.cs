@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -118,6 +119,36 @@ namespace CDM.Helper
                 }
             }
             DriveIsSelectedChanged?.Invoke(sender, e);
+        }
+
+        public static event EventHandler<bool> DrivesStateChanged;
+
+        public static async Task Check(CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                await Task.Delay(1000);
+                if (ct.IsCancellationRequested)
+                {
+                    break;
+                }
+                DriveInfo[] _drives = DriveInfo.GetDrives();//.Where(item => item.DriveType == DriveType.Network).ToArray();        
+                var _driveNameList = _drives.Select(item => item.Name).ToList();
+                var result = true;
+                foreach (var drive in DriveList)
+                {
+                    result = result && _driveNameList.Contains(drive.DriveName);
+                    if (!result)
+                    {
+                        DrivesStateChanged?.Invoke(null, false);
+                        break;
+                    }
+                }
+                if (result)
+                {
+                    DrivesStateChanged?.Invoke(null, true);
+                }
+            }
         }
     }
 }

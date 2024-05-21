@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Management;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +33,7 @@ namespace CDM.UserControls
         public delegate void dlgtTest();
         public event dlgtTest EventTest;
         private CDMViewModel vm = null;
+        private CancellationTokenSource cts = null;
 
         public CDMUserControl()
         {
@@ -126,29 +129,70 @@ namespace CDM.UserControls
         {
             vm.DrivesPageSize = (Convert.ToInt32(this.ActualWidth - 20D) / 472) * (Convert.ToInt32((this.ActualHeight - 130D) * 0.4D) / 104);
             vm.Init();
+
+            DriveManager.DrivesStateChanged += DriveManager_DrivesStateChanged;
+            cts = new CancellationTokenSource();
+            _ = DriveManager.Check(cts.Token);
+        }
+
+        private void DriveManager_DrivesStateChanged(object sender, bool e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (vm.Offline == e)
+                {
+                    vm.Offline = !e;
+                    if (vm.Offline)
+                    {
+                        vm.CancelSearch(this);
+                    }
+                }
+            });
         }
 
         private void UserControl_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) || e.Data.GetDataPresent("Shell IDList Array"))
             {
                 e.Effects = DragDropEffects.Copy;
-                e.Handled = true;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
             }
         }
 
         private void UserControl_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+             if (e.Data.GetDataPresent("Shell IDList Array"))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                e.Handled = true;
+                var shellObjects = (System.Runtime.InteropServices.ComTypes.IDataObject)e.Data.GetData("Shell IDList Array");
+                // Process shell objects (e.g., display their names in the TextBox)
+                ProcessShellObjects(shellObjects);
             }
+        }
+
+        private void ProcessShellObjects(System.Runtime.InteropServices.ComTypes.IDataObject shellObjects)
+        {
+            // Implementation for processing shell objects
+            // This example only demonstrates getting the shell objects and their display names
+            if (shellObjects == null)
+                return;
+
+            var dataFormat = DataFormats.GetDataFormat("Shell IDList Array");
+            
+            //if (shellObjects.GetDataPresent(dataFormat.Name))
+            //{
+            //    var obj = shellObjects.GetData(dataFormat.Name);
+            //    // Handle the shell objects (e.g., display their names in the TextBox)
+            //    // This part will require additional processing to extract useful information
+            //    textBox.Text += "Shell object dropped." + Environment.NewLine;
+            //}
         }
 
         private void UserControl_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (vm.CurFilterStatus.ShowDrives) vm.CurFilterStatus.ShowDrives = false;
+            if (!vm.EntereingDrives && vm.CurFilterStatus.ShowDrives) vm.CurFilterStatus.ShowDrives = false;
             if (vm.CurFilterStatus.ShowTypes) vm.CurFilterStatus.ShowTypes = false;
             if (vm.CurFilterStatus.ShowLocations) vm.CurFilterStatus.ShowLocations = false;
         }
@@ -158,6 +202,11 @@ namespace CDM.UserControls
             if (vm.CurFilterStatus.ShowDrives) vm.CurFilterStatus.ShowDrives = false;
             if (vm.CurFilterStatus.ShowTypes) vm.CurFilterStatus.ShowTypes = false;
             if (vm.CurFilterStatus.ShowLocations) vm.CurFilterStatus.ShowLocations = false;
+        }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            cts?.Cancel();
         }
     }
 }
