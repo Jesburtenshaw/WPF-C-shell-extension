@@ -3,14 +3,14 @@
 
 CApplicationSingleton _MainApplication;
 
-static LPCWSTR szPluginAssemblyName = L"cfsdrive.plugin";
-static LPCWSTR szPluginClassName = L"cfsdrive.plugin.ComPlugin";
+static LPCWSTR szPluginAssemblyName = L"CDM.plugin";
+static LPCWSTR szPluginClassName = L"CDM.plugin.ComPlugin";
 
 CApplication::CApplication() 
 	: m_bIsInitialized(FALSE)
 {
 	m_pLogger = auto_ptr<utilities::diagnostics::CLogger<utilities::threading::CIntraProcessLock>>(new utilities::diagnostics::CLogger<utilities::threading::CIntraProcessLock>(
-		utilities::diagnostics::log_level::Info, _T("cfsdrive-shell-namespace")));
+		utilities::diagnostics::log_level::Info, _T("CDM-shell-namespace")));
 
 	m_pLogger->AddOutputStream(new std::wofstream(BuildLogFileName()), true);
 	LOGINFO(m_pLogger, L"Initialized the Logger");

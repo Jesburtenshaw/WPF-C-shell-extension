@@ -1,27 +1,27 @@
 #pragma once
 
 #include "resource.h"       // main symbols
-#include "tierfiveshellext_i.h"
+#include "CDMshellext_i.h"
 #include <memory>
 #include "clrloadersimple.h"
 
-class CCfsDriveShellExt;
+class CDMShellExt;
 
-class fsdriveshellview
+class CDMshellview
 {
 };
 
 
-class ATL_NO_VTABLE CfsDriveShellView :
+class ATL_NO_VTABLE CDMShellView :
 	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CfsDriveShellView, &CLSID_FsDriveShellView>,
+	public CComCoClass<CDMShellView, &CLSID_CDMShellView>,
 	public IShellView,
 	public IOleCommandTarget,
-	public CWindowImpl<CfsDriveShellView>
+	public CWindowImpl<CDMShellView>
 {
 public:
-	CfsDriveShellView();
-	~CfsDriveShellView();
+	CDMShellView();
+	~CDMShellView();
 
 	DECLARE_NO_REGISTRY()
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -31,7 +31,7 @@ public:
 
 	DECLARE_WND_CLASS(NULL)
 
-	BEGIN_COM_MAP(CfsDriveShellView)
+	BEGIN_COM_MAP(CDMShellView)
 		COM_INTERFACE_ENTRY(IShellView)
 		COM_INTERFACE_ENTRY(IOleWindow)
 		COM_INTERFACE_ENTRY(IOleCommandTarget)

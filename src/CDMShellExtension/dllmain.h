@@ -1,10 +1,10 @@
 // dllmain.h : Declaration of module class.
 
-class CtierfiveshellextModule : public ATL::CAtlDllModuleT< CtierfiveshellextModule >
+class CDMshellextModule : public ATL::CAtlDllModuleT< CDMshellextModule >
 {
 public :
-	DECLARE_LIBID(LIBID_tierfiveshellextLib)
-	DECLARE_REGISTRY_APPID_RESOURCEID(IDR_TIERFIVESHELLEXT, "{09614f9a-0000-4e87-89e9-873111e4597a}")
+	DECLARE_LIBID(LIBID_CDMshellextLib)
+	DECLARE_REGISTRY_APPID_RESOURCEID(IDR_CDM_SHELL_EXT, "{09614f9a-0000-4e87-89e9-873111e4597a}")
 };
 
-extern class CtierfiveshellextModule _AtlModule;
+extern class CDMshellextModule _AtlModule;

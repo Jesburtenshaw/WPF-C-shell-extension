@@ -187,7 +187,7 @@ HRESULT CCLRLoader::CreateAppDomain(LPCWSTR szAssemblyName)
 	LOGINFO(_MainApplication->GetLogger(), L"The location is %s", strDirectory.c_str());
 
 	pDomainSetup->put_ApplicationBase(CComBSTR(strDirectory.c_str()));
-	pDomainSetup->put_ApplicationName(CComBSTR(L"fsdrive.plugin"));
+	pDomainSetup->put_ApplicationName(CComBSTR(L"CDM.plugin"));
 
 	tstring szConfigFile = strDirectory.c_str();
 	szConfigFile += szAssemblyName;

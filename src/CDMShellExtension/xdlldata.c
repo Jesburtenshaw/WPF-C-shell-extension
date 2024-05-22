@@ -12,6 +12,6 @@
 #define ENTRY_PREFIX	Prx
 
 #include "dlldata.c"
-#include "tierfive-shell-ext_p.c"
+#include "CDM-shell-ext_p.c"
 
 #endif //_MERGE_PROXYSTUB

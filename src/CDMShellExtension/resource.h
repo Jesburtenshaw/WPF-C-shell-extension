@@ -1,10 +1,10 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by tierfive-shell-ext.rc
+// Used by CDM-shell-ext.rc
 //
 #define IDS_PROJNAME                    100
-#define IDR_TIERFIVESHELLEXT            101
-#define IDR_CFSDRIVESHELLEXT            106
+#define IDR_CDM_SHELL_EXT            101
+#define IDR_CDMSHELLEXT            106
 #define IDI_ICON1                       201
 #define IDI_CFSMAIN                     201
 

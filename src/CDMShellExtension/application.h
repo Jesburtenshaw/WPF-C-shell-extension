@@ -5,7 +5,7 @@
 #include "threading.h"
 #include "log.h"
 #include "clrloader.h"
-#include "tierfiveshellext_i.h"
+#include "CDMshellext_i.h"
 
 class CApplication
 {

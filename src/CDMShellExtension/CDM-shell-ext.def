@@ -1,4 +1,4 @@
-; tierfive-shell-ext.def : Declares the module parameters.
+; CDM-shell-ext.def : Declares the module parameters.
 
 LIBRARY
 

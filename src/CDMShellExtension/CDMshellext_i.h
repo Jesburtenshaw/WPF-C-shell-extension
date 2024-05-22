@@ -6,7 +6,7 @@
  /* File created by MIDL compiler version 8.01.0628 */
 /* at Tue Jan 19 11:14:07 2038
  */
-/* Compiler settings for tierfiveshellext.idl:
+/* Compiler settings for CDMshellext.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0628 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
@@ -35,8 +35,8 @@
 #include "ole2.h"
 #endif /*COM_NO_WINDOWS_H*/
 
-#ifndef __tierfiveshellext_i_h__
-#define __tierfiveshellext_i_h__
+#ifndef __CDMshellext_i_h__
+#define __CDMshellext_i_h__
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -59,42 +59,42 @@ typedef interface IFSShellPlugin IFSShellPlugin;
 #endif 	/* __IFSShellPlugin_FWD_DEFINED__ */
 
 
-#ifndef __ICfsDriveShellExt_FWD_DEFINED__
-#define __ICfsDriveShellExt_FWD_DEFINED__
-typedef interface ICfsDriveShellExt ICfsDriveShellExt;
+#ifndef __ICDMShellExt_FWD_DEFINED__
+#define __ICDMShellExt_FWD_DEFINED__
+typedef interface ICDMShellExt ICDMShellExt;
 
-#endif 	/* __ICfsDriveShellExt_FWD_DEFINED__ */
-
-
-#ifndef __ICfsDriveShellView_FWD_DEFINED__
-#define __ICfsDriveShellView_FWD_DEFINED__
-typedef interface ICfsDriveShellView ICfsDriveShellView;
-
-#endif 	/* __ICfsDriveShellView_FWD_DEFINED__ */
+#endif 	/* __ICDMShellExt_FWD_DEFINED__ */
 
 
-#ifndef __CfsDriveShellExt_FWD_DEFINED__
-#define __CfsDriveShellExt_FWD_DEFINED__
+#ifndef __ICDMShellView_FWD_DEFINED__
+#define __ICDMShellView_FWD_DEFINED__
+typedef interface ICDMShellView ICDMShellView;
 
-#ifdef __cplusplus
-typedef class CfsDriveShellExt CfsDriveShellExt;
-#else
-typedef struct CfsDriveShellExt CfsDriveShellExt;
-#endif /* __cplusplus */
-
-#endif 	/* __CfsDriveShellExt_FWD_DEFINED__ */
+#endif 	/* __ICDMShellView_FWD_DEFINED__ */
 
 
-#ifndef __FsDriveShellView_FWD_DEFINED__
-#define __FsDriveShellView_FWD_DEFINED__
+#ifndef __CDMShellExt_FWD_DEFINED__
+#define __CDMShellExt_FWD_DEFINED__
 
 #ifdef __cplusplus
-typedef class FsDriveShellView FsDriveShellView;
+typedef class CDMShellExt CDMShellExt;
 #else
-typedef struct FsDriveShellView FsDriveShellView;
+typedef struct CDMShellExt CDMShellExt;
 #endif /* __cplusplus */
 
-#endif 	/* __FsDriveShellView_FWD_DEFINED__ */
+#endif 	/* __CDMShellExt_FWD_DEFINED__ */
+
+
+#ifndef __CDMShellView_FWD_DEFINED__
+#define __CDMShellView_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class CDMShellView CDMShellView;
+#else
+typedef struct CDMShellView CDMShellView;
+#endif /* __cplusplus */
+
+#endif 	/* __CDMShellView_FWD_DEFINED__ */
 
 
 /* header files for imported files */
@@ -265,19 +265,19 @@ EXTERN_C const IID IID_IFSShellPlugin;
 #endif 	/* __IFSShellPlugin_INTERFACE_DEFINED__ */
 
 
-#ifndef __ICfsDriveShellExt_INTERFACE_DEFINED__
-#define __ICfsDriveShellExt_INTERFACE_DEFINED__
+#ifndef __ICDMShellExt_INTERFACE_DEFINED__
+#define __ICDMShellExt_INTERFACE_DEFINED__
 
-/* interface ICfsDriveShellExt */
+/* interface ICDMShellExt */
 /* [unique][nonextensible][dual][uuid][object] */ 
 
 
-EXTERN_C const IID IID_ICfsDriveShellExt;
+EXTERN_C const IID IID_ICDMShellExt;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
     
     MIDL_INTERFACE("b203cd4b-9f89-4949-9aa2-8ffe7ac02de9")
-    ICfsDriveShellExt : public IUnknown
+    ICDMShellExt : public IUnknown
     {
     public:
     };
@@ -285,31 +285,31 @@ EXTERN_C const IID IID_ICfsDriveShellExt;
     
 #else 	/* C style interface */
 
-    typedef struct ICfsDriveShellExtVtbl
+    typedef struct ICDMShellExtVtbl
     {
         BEGIN_INTERFACE
         
         DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            ICfsDriveShellExt * This,
+            ICDMShellExt * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
             _COM_Outptr_  void **ppvObject);
         
         DECLSPEC_XFGVIRT(IUnknown, AddRef)
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            ICfsDriveShellExt * This);
+            ICDMShellExt * This);
         
         DECLSPEC_XFGVIRT(IUnknown, Release)
         ULONG ( STDMETHODCALLTYPE *Release )( 
-            ICfsDriveShellExt * This);
+            ICDMShellExt * This);
         
         END_INTERFACE
-    } ICfsDriveShellExtVtbl;
+    } ICDMShellExtVtbl;
 
-    interface ICfsDriveShellExt
+    interface ICDMShellExt
     {
-        CONST_VTBL struct ICfsDriveShellExtVtbl *lpVtbl;
+        CONST_VTBL struct ICDMShellExtVtbl *lpVtbl;
     };
 
     
@@ -317,13 +317,13 @@ EXTERN_C const IID IID_ICfsDriveShellExt;
 #ifdef COBJMACROS
 
 
-#define ICfsDriveShellExt_QueryInterface(This,riid,ppvObject)	\
+#define ICDMShellExt_QueryInterface(This,riid,ppvObject)	\
     ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
-#define ICfsDriveShellExt_AddRef(This)	\
+#define ICDMShellExt_AddRef(This)	\
     ( (This)->lpVtbl -> AddRef(This) ) 
 
-#define ICfsDriveShellExt_Release(This)	\
+#define ICDMShellExt_Release(This)	\
     ( (This)->lpVtbl -> Release(This) ) 
 
 
@@ -335,22 +335,22 @@ EXTERN_C const IID IID_ICfsDriveShellExt;
 
 
 
-#endif 	/* __ICfsDriveShellExt_INTERFACE_DEFINED__ */
+#endif 	/* __ICDMShellExt_INTERFACE_DEFINED__ */
 
 
-#ifndef __ICfsDriveShellView_INTERFACE_DEFINED__
-#define __ICfsDriveShellView_INTERFACE_DEFINED__
+#ifndef __ICDMShellView_INTERFACE_DEFINED__
+#define __ICDMShellView_INTERFACE_DEFINED__
 
-/* interface ICfsDriveShellView */
+/* interface ICDMShellView */
 /* [unique][helpstring][uuid][object] */ 
 
 
-EXTERN_C const IID IID_ICfsDriveShellView;
+EXTERN_C const IID IID_ICDMShellView;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
     
     MIDL_INTERFACE("252BA8FF-F9DC-4758-B72C-17C05D53BC72")
-    ICfsDriveShellView : public IUnknown
+    ICDMShellView : public IUnknown
     {
     public:
     };
@@ -358,31 +358,31 @@ EXTERN_C const IID IID_ICfsDriveShellView;
     
 #else 	/* C style interface */
 
-    typedef struct ICfsDriveShellViewVtbl
+    typedef struct ICDMShellViewVtbl
     {
         BEGIN_INTERFACE
         
         DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            ICfsDriveShellView * This,
+            ICDMShellView * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
             _COM_Outptr_  void **ppvObject);
         
         DECLSPEC_XFGVIRT(IUnknown, AddRef)
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            ICfsDriveShellView * This);
+            ICDMShellView * This);
         
         DECLSPEC_XFGVIRT(IUnknown, Release)
         ULONG ( STDMETHODCALLTYPE *Release )( 
-            ICfsDriveShellView * This);
+            ICDMShellView * This);
         
         END_INTERFACE
-    } ICfsDriveShellViewVtbl;
+    } ICDMShellViewVtbl;
 
-    interface ICfsDriveShellView
+    interface ICDMShellView
     {
-        CONST_VTBL struct ICfsDriveShellViewVtbl *lpVtbl;
+        CONST_VTBL struct ICDMShellViewVtbl *lpVtbl;
     };
 
     
@@ -390,13 +390,13 @@ EXTERN_C const IID IID_ICfsDriveShellView;
 #ifdef COBJMACROS
 
 
-#define ICfsDriveShellView_QueryInterface(This,riid,ppvObject)	\
+#define ICDMShellView_QueryInterface(This,riid,ppvObject)	\
     ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
-#define ICfsDriveShellView_AddRef(This)	\
+#define ICDMShellView_AddRef(This)	\
     ( (This)->lpVtbl -> AddRef(This) ) 
 
-#define ICfsDriveShellView_Release(This)	\
+#define ICDMShellView_Release(This)	\
     ( (This)->lpVtbl -> Release(This) ) 
 
 
@@ -408,35 +408,35 @@ EXTERN_C const IID IID_ICfsDriveShellView;
 
 
 
-#endif 	/* __ICfsDriveShellView_INTERFACE_DEFINED__ */
+#endif 	/* __ICDMShellView_INTERFACE_DEFINED__ */
 
 
 
-#ifndef __tierfiveshellextLib_LIBRARY_DEFINED__
-#define __tierfiveshellextLib_LIBRARY_DEFINED__
+#ifndef __CDMshellextLib_LIBRARY_DEFINED__
+#define __CDMshellextLib_LIBRARY_DEFINED__
 
-/* library tierfiveshellextLib */
+/* library CDMshellextLib */
 /* [version][uuid] */ 
 
 
-EXTERN_C const IID LIBID_tierfiveshellextLib;
+EXTERN_C const IID LIBID_CDMshellextLib;
 
-EXTERN_C const CLSID CLSID_CfsDriveShellExt;
+EXTERN_C const CLSID CLSID_CDMShellExt;
 
 #ifdef __cplusplus
 
 class DECLSPEC_UUID("f70a8770-1f4b-4af5-90e4-35260bcd97df")
-CfsDriveShellExt;
+CDMShellExt;
 #endif
 
-EXTERN_C const CLSID CLSID_FsDriveShellView;
+EXTERN_C const CLSID CLSID_CDMShellView;
 
 #ifdef __cplusplus
 
 class DECLSPEC_UUID("61963ADC-3165-404C-9381-32C21CD3C754")
-FsDriveShellView;
+CDMShellView;
 #endif
-#endif /* __tierfiveshellextLib_LIBRARY_DEFINED__ */
+#endif /* __CDMshellextLib_LIBRARY_DEFINED__ */
 
 /* Additional Prototypes for ALL interfaces */
 
