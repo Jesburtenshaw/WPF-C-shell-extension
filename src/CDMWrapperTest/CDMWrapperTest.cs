@@ -23,7 +23,7 @@ namespace CDMWrapperTest
             var wih = new System.Windows.Interop.WindowInteropHelper(this);
             var hWnd = wih.Handle;
             var w = new CDMWrapper.CDMWrapper();
-            w.showCDM(hWnd);
+            w.showCDM((long)hWnd);
         }
 
         [STAThread]
