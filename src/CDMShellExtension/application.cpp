@@ -79,7 +79,7 @@ tstring CApplication::BuildLogFileName()
 	time(&szClock);
 	localtime_s(&newTime, &szClock);
 
-	wcsftime(buffer, sizeof(buffer), L"addin-%d-%m-%Y-%H-%M-%S.log", &newTime);
+	wcsftime(buffer, sizeof(buffer), L"CDM-%d%m%Y-%H%M%S.log", &newTime);
 	tstring addinName(buffer);
 
 	tstring logFileName = utilities::path_info::get_dll_folder(_AtlBaseModule.GetModuleInstance());
