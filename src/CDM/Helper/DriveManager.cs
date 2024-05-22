@@ -33,7 +33,7 @@ namespace CDM.Helper
 
             try
             {
-                DriveInfo[] drives = DriveInfo.GetDrives();//.Where(item => item.DriveType == DriveType.Network).ToArray();        
+                DriveInfo[] drives = DriveInfo.GetDrives().Where(item => item.DriveType == DriveType.Network).ToArray();        
                 foreach (DriveInfo drive in drives)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -56,26 +56,6 @@ namespace CDM.Helper
                         Drives.Add(fcm);
                     });
                 }
-                //DriveList.Add(new DriveModel()
-                //{
-                //    DriveName = "Test1",
-                //    DriveDescription = "Tetsing",
-                //});
-                //DriveList.Add(new DriveModel()
-                //{
-                //    DriveName = "Test2",
-                //    DriveDescription = "Tetsing2",
-                //});
-                //DriveList.Add(new DriveModel()
-                //{
-                //    DriveName = "Test3",
-                //    DriveDescription = "Tetsing2",
-                //});
-                //DriveList.Add(new DriveModel()
-                //{
-                //    DriveName = "Test4",
-                //    DriveDescription = "Tetsing2",
-                //});
             }
             catch (Exception ex)
             {
@@ -132,7 +112,7 @@ namespace CDM.Helper
                 {
                     break;
                 }
-                DriveInfo[] _drives = DriveInfo.GetDrives();//.Where(item => item.DriveType == DriveType.Network).ToArray();        
+                DriveInfo[] _drives = DriveInfo.GetDrives().Where(item => item.DriveType == DriveType.Network).ToArray();        
                 var _driveNameList = _drives.Select(item => item.Name).ToList();
                 var result = true;
                 foreach (var drive in DriveList)
