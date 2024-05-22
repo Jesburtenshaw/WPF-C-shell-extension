@@ -128,7 +128,8 @@ namespace CDM.UserControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            vm.DrivesPageSize = (Convert.ToInt32(this.ActualWidth - 20D) / 472) * (Convert.ToInt32((this.ActualHeight - 130D) * 0.4D) / 104);
+            var drivesPageSize = (Convert.ToInt32(this.ActualWidth - 20D) / 472) * (Convert.ToInt32((this.ActualHeight - 130D) * 0.4D) / 104);
+            vm.DrivesPageSize = drivesPageSize == 0 ? 1 : drivesPageSize;
             vm.Init();
 
             DriveManager.DrivesStateChanged += DriveManager_DrivesStateChanged;
