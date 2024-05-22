@@ -1,30 +1,30 @@
-// CDMshellext.h : Declaration of the CDMshellext
+// cfsdriveshellext.h : Declaration of the Cfsdriveshellext
 
 #pragma once
 #include "resource.h"       // main symbols
-#include "CDMshellext_i.h"
+#include "tierfiveshellext_i.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
 
 
-// CDMShellExt
+// CCfsDriveShellExt
 
-class ATL_NO_VTABLE CDMShellExt :
+class ATL_NO_VTABLE CCfsDriveShellExt :
 	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CDMShellExt, &CLSID_CDMShellExt>,
-	public IObjectWithSiteImpl<CDMShellExt>,
+	public CComCoClass<CCfsDriveShellExt, &CLSID_CfsDriveShellExt>,
+	public IObjectWithSiteImpl<CCfsDriveShellExt>,
 	public IPersistFolder2,
 	public IShellFolder2
 {
 public:
-	CDMShellExt();
-	~CDMShellExt();
+	CCfsDriveShellExt();
+	~CCfsDriveShellExt();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_CDMSHELLEXT)
+DECLARE_REGISTRY_RESOURCEID(IDR_CFSDRIVESHELLEXT)
 
-BEGIN_COM_MAP(CDMShellExt)
+BEGIN_COM_MAP(CCfsDriveShellExt)
 	COM_INTERFACE_ENTRY2(IPersist, IPersistFolder2)
 	COM_INTERFACE_ENTRY2(IPersistFolder, IPersistFolder2)
 	COM_INTERFACE_ENTRY(IPersistFolder2)
@@ -89,7 +89,7 @@ private:
 			GDNM_FOREDITING = 0x00000008
 		};
 
-		HRESULT(CDMShellExt::* _GetDisplayNameOf)(PCUITEMID_CHILD pidl, SHGDNF uFlags, __deref_out PWSTR* ppszPath);
+		HRESULT(CCfsDriveShellExt::* _GetDisplayNameOf)(PCUITEMID_CHILD pidl, SHGDNF uFlags, __deref_out PWSTR* ppszPath);
 	} _DisplayNameOfInfo[];
 
 	HRESULT _GetDisplayNameOfDisplayName(PCUITEMID_CHILD pidl, SHGDNF uFlags, __deref_out PWSTR* ppszName);
@@ -98,4 +98,4 @@ private:
 	HRESULT _GetDisplayNameOfParsingPath(PCUITEMID_CHILD pidl, SHGDNF uFlags, __deref_out PWSTR* ppszPath);
 };
 
-OBJECT_ENTRY_AUTO(__uuidof(CDMShellExt), CDMShellExt)
+OBJECT_ENTRY_AUTO(__uuidof(CfsDriveShellExt), CCfsDriveShellExt)

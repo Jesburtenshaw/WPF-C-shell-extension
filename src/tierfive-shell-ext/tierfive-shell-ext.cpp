@@ -1,10 +1,10 @@
-// CDM-shell-ext.cpp : Implementation of DLL Exports.
+// tierfive-shell-ext.cpp : Implementation of DLL Exports.
 
 
 #include "pch.h"
 #include "framework.h"
 #include "resource.h"
-#include "CDMshellext_i.h"
+#include "tierfiveshellext_i.h"
 #include "dllmain.h"
 #include "xdlldata.h"
 
