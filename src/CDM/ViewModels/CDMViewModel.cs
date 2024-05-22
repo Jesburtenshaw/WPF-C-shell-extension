@@ -29,6 +29,7 @@ namespace CDM.ViewModels
 
             //RecentItemSortCommand = new RelayCommand(RecentItemSort);
 
+            DragDropTaskList = new ObservableCollection<DragDropTaskModel>();
             PagedDrivesList = new ObservableCollection<DriveModel>();
             DriveSelectedItem = new DriveModel();
             FoldersItemList = new ObservableCollection<FileFolderModel>();
@@ -74,26 +75,13 @@ namespace CDM.ViewModels
             CurFilterStatus.PropertyChanged += FilterStatus_PropertyChanged;
         }
 
-        private void FilterStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals(nameof(CurFilterStatus.DrivesCount)))
-            {
-                DrivesPagesCount = CurFilterStatus.DrivesCount % DrivesPageSize == 0 ? (CurFilterStatus.DrivesCount / DrivesPageSize) : (CurFilterStatus.DrivesCount / DrivesPageSize + 1);
-                return;
-            }
-        }
-
-        private void SearchStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals(nameof(CurSearchStatus.IsDoing)))
-            {
-                CurSearchStatus.CanSearch = !CurSearchStatus.IsDoing;
-            }
-        }
-
         #endregion
 
         #region :: Properties ::
+
+        public bool EntereingDrives { get; set; } = false;
+        private string forbiddenChars = "\\/:*\"<>|";
+        private string curNavigatingFolderPath = "";
 
         public int DrivesPageSize { get; set; }
         public int DrivesPagesCount { get; set; }
@@ -128,6 +116,16 @@ namespace CDM.ViewModels
             {
                 isLastDrivesPage = value;
                 OnPropertyChanged(nameof(IsLastDrivesPage));
+            }
+        }
+        private ObservableCollection<DragDropTaskModel> _dragDropTaskList;
+        public ObservableCollection<DragDropTaskModel> DragDropTaskList
+        {
+            get { return _dragDropTaskList; }
+            set
+            {
+                _dragDropTaskList = value;
+                OnPropertyChanged(nameof(DragDropTaskList));
             }
         }
 
@@ -923,7 +921,6 @@ namespace CDM.ViewModels
             CurSearchStatus.Desc = "";
         }
 
-        public bool EntereingDrives { get; set; } = false;
         private void ShowDrives(object obj)
         {
             var str = obj as string;
@@ -1328,7 +1325,6 @@ namespace CDM.ViewModels
             */
         }
 
-        private string forbiddenChars = "\\/:*\"<>|";
         private void RenameTextChanged(object sender)
         {
             CurRenameStatus.IsError = false;
@@ -1424,7 +1420,6 @@ namespace CDM.ViewModels
             }
         }
 
-        private string curNavigatingFolderPath = "";
         public void NavigateToFolder(string folderPath)
         {
             var isRoot = IsRootFolder(folderPath);
@@ -1580,41 +1575,6 @@ namespace CDM.ViewModels
                 return (item as FileFolderModel).Name.IndexOf(TxtSearchBoxItem, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        private void CDMViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals(nameof(SelectedType)))
-            {
-                //if (CurFilterStatus.ShowTypes) CurFilterStatus.ShowTypes = !CurFilterStatus.ShowTypes;
-                CurFilterStatus.CurType = string.IsNullOrEmpty(SelectedType?.Code) ? "" : SelectedType?.Name;
-                DoFilter(sender);
-                return;
-            }
-            if (e.PropertyName.Equals(nameof(SelectedLocation)))
-            {
-                //if (CurFilterStatus.ShowLocations) CurFilterStatus.ShowLocations = !CurFilterStatus.ShowLocations;
-                return;
-            }
-            if (e.PropertyName.Equals(nameof(CurDrivesPagesIndex)))
-            {
-                IsFirstDrivesPage = CurDrivesPagesIndex == 1;
-                IsLastDrivesPage = CurDrivesPagesIndex == DrivesPagesCount;
-                var list = DriveList.Skip((CurDrivesPagesIndex - 1) * DrivesPageSize).Take(DrivesPageSize);
-                PagedDrivesList.Clear();
-                foreach (var item in list)
-                {
-                    PagedDrivesList.Add(item);
-                }
-                return;
-            }
-        }
-
-        private void DriveManager_DriveIsSelectedChanged(object sender, EventArgs e)
-        {
-            var SelectedDrives = Drives.Where(item => item.IsSelected && !string.IsNullOrEmpty(item.Code)).ToList();
-            CurFilterStatus.CurDrives = SelectedDrives.Count <= 1 ? SelectedDrives.FirstOrDefault()?.Name : $"{SelectedDrives.First().Name} +{(SelectedDrives.Count - 1)}";
-            DoFilter(sender);
-        }
-
         private void DoFilter(object obj)
         {
             var SelectedDrives = Drives.Where(item => item.IsSelected).ToList();
@@ -1728,6 +1688,63 @@ namespace CDM.ViewModels
         //{
         //    IsAscending = !IsAscending;
         //}
+
+        #endregion
+
+        #region :: Events ::
+
+        private void CDMViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(SelectedType)))
+            {
+                //if (CurFilterStatus.ShowTypes) CurFilterStatus.ShowTypes = !CurFilterStatus.ShowTypes;
+                CurFilterStatus.CurType = string.IsNullOrEmpty(SelectedType?.Code) ? "" : SelectedType?.Name;
+                DoFilter(sender);
+                return;
+            }
+            if (e.PropertyName.Equals(nameof(SelectedLocation)))
+            {
+                //if (CurFilterStatus.ShowLocations) CurFilterStatus.ShowLocations = !CurFilterStatus.ShowLocations;
+                return;
+            }
+            if (e.PropertyName.Equals(nameof(CurDrivesPagesIndex)))
+            {
+                IsFirstDrivesPage = CurDrivesPagesIndex == 1;
+                IsLastDrivesPage = CurDrivesPagesIndex == DrivesPagesCount;
+                var list = DriveList.Skip((CurDrivesPagesIndex - 1) * DrivesPageSize).Take(DrivesPageSize);
+                PagedDrivesList.Clear();
+                foreach (var item in list)
+                {
+                    PagedDrivesList.Add(item);
+                }
+                return;
+            }
+        }
+
+        private void DriveManager_DriveIsSelectedChanged(object sender, EventArgs e)
+        {
+            var SelectedDrives = Drives.Where(item => item.IsSelected && !string.IsNullOrEmpty(item.Code)).ToList();
+            CurFilterStatus.CurDrives = SelectedDrives.Count <= 1 ? SelectedDrives.FirstOrDefault()?.Name : $"{SelectedDrives.First().Name} +{(SelectedDrives.Count - 1)}";
+            DoFilter(sender);
+        }
+
+        private void FilterStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(CurFilterStatus.DrivesCount)))
+            {
+                DrivesPagesCount = CurFilterStatus.DrivesCount % DrivesPageSize == 0 ? (CurFilterStatus.DrivesCount / DrivesPageSize) : (CurFilterStatus.DrivesCount / DrivesPageSize + 1);
+                return;
+            }
+        }
+
+        private void SearchStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(CurSearchStatus.IsDoing)))
+            {
+                CurSearchStatus.CanSearch = !CurSearchStatus.IsDoing;
+            }
+        }
+
 
         #endregion
     }

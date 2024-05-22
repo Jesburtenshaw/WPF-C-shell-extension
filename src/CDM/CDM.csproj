@@ -223,6 +223,7 @@
     <Compile Include="Helper\ResourceDictionaryManager.cs" />
     <Compile Include="Helper\StarManager.cs" />
     <Compile Include="Helper\ViewModelBase.cs" />
+    <Compile Include="Models\DragDropTaskModel.cs" />
     <Compile Include="Models\FilterConditionModel.cs" />
     <Compile Include="Models\RenameStatusModel.cs" />
     <Compile Include="Models\FilterStatusModel.cs" />
